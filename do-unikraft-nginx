@@ -1,0 +1,123 @@
+#!/bin/bash
+
+top=unikraft-nginx
+libs=unikraft-nginx/libs
+apps=unikraft-nginx/libs
+uk=unikraft-nginx/unikraft
+app=unikraft-nginx/apps/app-nginx
+
+setup()
+{
+    mkdir -p "$top"
+    mkdir -p "$libs"
+    mkdir -p "$apps"
+
+    git clone https://github.com/unikraft/unikraft "$uk"
+
+    git clone https://github.com/unikraft/app-nginx "$app"
+    git clone https://github.com/unikraft/lib-nginx "$libs"/nginx
+    git clone https://github.com/unikraft/lib-newlib "$libs"/newlib
+    git clone https://github.com/unikraft/lib-pthread-embedded "$libs"/pthread-embedded
+    git clone https://github.com/unikraft/lib-lwip "$libs"/lwip
+
+    pushd "$libs"/nginx > /dev/null
+    git remote add upb https://github.com/unikraft-upb/lib-nginx
+    git fetch upb
+    git checkout -b add-posix-lib-dependency upb/add-posix-lib-dependency
+    popd > /dev/null
+}
+
+build()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft configure -F -m x86_64 -p kvm
+    kraft build
+    popd > /dev/null
+}
+
+clean()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft clean -d
+    popd > /dev/null
+}
+
+remove()
+{
+    rm -fr "$top"
+}
+
+_setup_networking()
+{
+    sudo ip link set dev virbr0 down
+    sudo ip link del dev virbr0
+    sudo ip link add virbr0 type bridge
+    sudo ip address add 172.44.0.1/24 dev virbr0
+    sudo ip link set dev virbr0 up
+}
+
+run()
+{
+    _setup_networking
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft run -M 512 -b virbr0 "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --"
+    popd > /dev/null
+}
+
+run_qemu()
+{
+    _setup_networking
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 -fsdev local,id=myid,path=$(pwd)/fs0,security_model=none \
+                            -device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off \
+                            -netdev bridge,id=en0,br=virbr0 \
+                            -device virtio-net-pci,netdev=en0 \
+                            -kernel "build/nginx_kvm-x86_64" \
+                            -append "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --" \
+                            -cpu host \
+                            -enable-kvm \
+                            -nographic
+    popd > /dev/null
+}
+
+if test $# -ne 1; then
+    echo "Usage: $0 <command>" 1>&2
+    echo "  command: setup build clean run run_qemu remove" 1>&2
+    exit 1
+fi
+
+command="$1"
+
+case "$command" in
+
+    "setup")
+        setup
+        ;;
+
+    "build")
+        build
+        ;;
+
+    "clean")
+        clean
+        ;;
+
+    "run")
+        run
+        ;;
+
+    "run_qemu")
+        run_qemu
+        ;;
+
+    "remove")
+        remove
+        ;;
+
+    *)
+        echo "Unknown command"
+        exit 1
+esac
