@@ -85,3 +85,68 @@ Pass required commands to script:
    </body>
    </html>
    ```
+
+## Python3
+
+Use the `do-unikraft-python3` to set up, build and run [`app-python3`](github.com/unikraft/app-python3) with Unikraft.
+Run the script anywhere.
+It will create a conventional local file hierarchy for building the Unikraft image.
+
+Pass required commands to script:
+
+1. First, set up repositories:
+
+   ```
+   $ ./do-unikraft-python3 setup
+   ```
+
+   This results in creating the `unikraft-python3/` folder with the local conventional file hierarchy:
+
+   ```
+   $ tree -L 2 unikraft-python3/
+   unikraft-python3/
+   |-- apps
+   |   `-- app-python3
+   |-- libs
+   |   |-- libuuid
+   |   |-- lwip
+   |   |-- newlib
+   |   |-- pthread-embedded
+   |   |-- python3
+   |   `-- zlib
+   `-- unikraft
+   [...]
+   ```
+
+1. Build the Python3 Unikraft image:
+
+   ```
+   $ ./do-unikraft-python3 build
+
+   [...]
+   Successfully built unikernels:
+
+     => build/python3_kvm-x86_64
+     => build/python3_kvm-x86_64.dbg (with symbols)
+
+   To instantiate, use: kraft run
+   ```
+
+1. Run the Python3 Unikraft image:
+
+   ```
+   $ ./do-unikraft-python3 run
+
+   [...]
+   Booting from ROM...
+   Powered by
+   o.   .o       _ _               __ _
+   Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+   oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
+   oOo oOO| | | | |   (| | | (_) |  _) :_
+    OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
+                     Phoebe 0.10.0~9bf6e63
+   Hello, world!
+   ```
+
+   The image runs the `helloworld.py` script located in the filesystem archive (`minrootfs.tgz`), resulting in the printing of the `Hello, world!` message.

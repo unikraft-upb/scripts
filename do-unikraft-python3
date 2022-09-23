@@ -1,0 +1,107 @@
+#!/bin/bash
+
+top=unikraft-python3
+libs="$top"/libs
+apps="$top"/libs
+uk="$top"/unikraft
+app="$top"/apps/app-python3
+
+setup()
+{
+    mkdir -p "$top"
+    mkdir -p "$libs"
+    mkdir -p "$apps"
+
+    git clone https://github.com/unikraft/unikraft "$uk"
+
+    git clone https://github.com/unikraft/app-python3 "$app"
+    git clone https://github.com/unikraft/lib-python3 "$libs"/python3
+    git clone https://github.com/unikraft/lib-zlib "$libs"/zlib
+    git clone https://github.com/unikraft/lib-libuuid "$libs"/libuuid
+    git clone https://github.com/unikraft/lib-newlib "$libs"/newlib
+    git clone https://github.com/unikraft/lib-pthread-embedded "$libs"/pthread-embedded
+    git clone https://github.com/unikraft/lib-lwip "$libs"/lwip
+}
+
+build()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft configure -F -m x86_64 -p kvm
+    kraft build
+    popd > /dev/null
+}
+
+clean()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft clean -d
+    popd > /dev/null
+}
+
+remove()
+{
+    rm -fr "$top"
+}
+
+run()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft run -M 1024 " -- helloworld.py"
+    popd > /dev/null
+}
+
+run_qemu()
+{
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 -fsdev local,id=myid,path=$(pwd)/fs0,security_model=none \
+                            -device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off \
+                            -kernel "build/python3_kvm-x86_64" \
+                            -append "-- helloworld.py" \
+                            -cpu host \
+                            -enable-kvm \
+                            -m 1G \
+                            -nographic
+    popd > /dev/null
+}
+
+if test $# -ne 1; then
+    echo "Usage: $0 <command>" 1>&2
+    echo "  command: setup build clean run run_qemu remove" 1>&2
+    exit 1
+fi
+
+command="$1"
+
+case "$command" in
+
+    "setup")
+        setup
+        ;;
+
+    "build")
+        build
+        ;;
+
+    "clean")
+        clean
+        ;;
+
+    "run")
+        run
+        ;;
+
+    "run_qemu")
+        run_qemu
+        ;;
+
+    "remove")
+        remove
+        ;;
+
+    *)
+        echo "Unknown command"
+        exit 1
+esac
