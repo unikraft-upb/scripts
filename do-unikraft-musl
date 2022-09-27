@@ -1,0 +1,203 @@
+#!/bin/bash
+
+top=unikraft-musl
+libs="$top"/libs
+apps="$top"/apps
+uk="$top"/unikraft
+app="$top"/apps/app-helloworld
+
+setup_unikraft()
+{
+    # Use Simon's scheduling branch.
+    #git remote add skuenzer https://github.com/skuenzer/unikraft
+    #git fetch skuenzer
+    #git checkout -b skuenzer/sched-refactor skuenzer/skuenzer/sched-refactor
+
+    ## Integrate PR #454: lib/uktime: Solve redefining conflicts
+    #git remote add dragosargint https://github.com/dragosargint/unikraft
+    #git fetch dragosargint
+    #git checkout -b uktime dragosargint/uktime
+
+    ## Rebase the two branches.
+    #git checkout -b musl-support staging
+    #git rebase uktime
+    #git rebase skuenzer/sched-refactor
+
+    # Use a merging of Simon's and Dragos's changes.
+    git remote add upb https://github.com/unikraft-upb/unikraft
+    git fetch upb
+    git checkout -b musl-support upb/musl-support
+}
+
+setup_app()
+{
+    # Use updated kraft.yaml (including Musl dependency).
+    git remote add upb https://github.com/unikraft-upb/app-helloworld
+    git fetch upb
+    git checkout -b use-musl upb/use-musl
+}
+
+setup_musl()
+{
+    # Integrate PR #9: Thread support for musl
+    git remote add dragosargint https://github.com/dragosargint/lib-musl/
+    git fetch dragosargint
+    git checkout -b thread_support dragosargint/thread_support
+
+    # Integrate aarch64 PRs: #6, #7, #11, #13
+    git remote add kubanrob https://github.com/kubanrob/lib-musl/
+    git fetch kubanrob
+    git checkout -b add-patches-for-aarch64 kubanrob/add-patches-for-aarch64
+    git checkout -b update-aarch64-makefiles kubanrob/update-aarch64-makefiles
+    git checkout -b patch-CVE-2020-28928 kubanrob/patch-CVE-2020-28928
+    git checkout -b hide-internal-headers kubanrob/hide-internal-headers
+
+    # Integrate PR #12: Add syscall wrapper for getrandom
+    git remote add michpappas https://github.com/michpappas/lib-musl/
+    git fetch michpappas
+    git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
+
+    # Rebase all branches
+    git checkout -b musl-support staging
+    git rebase thread_support
+    git rebase add-patches-for-aarch64
+    git rebase update-aarch64-makefiles
+    #git rebase patch-CVE-2020-28928
+    git rebase hide-internal-headers
+    #git rebase add_syscall_wrapper_for_getrandom
+}
+
+setup_lwip()
+{
+    # Integrate PR #19: Adopt to refactored scheduling API (lib/uksched)
+    git remote add skuenzer https://github.com/skuenzer/lib-lwip
+    git fetch skuenzer
+    git checkout -b skuenzer/sched-refactor skuenzer/skuenzer/sched-refactor
+}
+
+setup()
+{
+    mkdir -p "$top"
+    mkdir -p "$libs"
+    mkdir -p "$apps"
+
+    git clone https://github.com/unikraft/unikraft "$uk"
+
+    git clone https://github.com/unikraft/app-helloworld "$app"
+    git clone https://github.com/unikraft/lib-musl "$libs"/musl
+    git clone https://github.com/unikraft/lib-lwip "$libs"/lwip
+
+    pushd "$uk" > /dev/null
+    setup_unikraft
+    popd > /dev/null
+
+    pushd "$app" > /dev/null
+    setup_app
+    popd > /dev/null
+
+    pushd "$libs"/musl > /dev/null
+    setup_musl
+    popd > /dev/null
+
+    pushd "$libs"/lwip > /dev/null
+    setup_lwip
+    popd > /dev/null
+}
+
+build()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft configure -F -m x86_64 -p kvm
+    kraft build
+    popd > /dev/null
+}
+
+clean()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft clean -d
+    popd > /dev/null
+}
+
+remove()
+{
+    rm -fr "$top"
+}
+
+_setup_networking()
+{
+    sudo ip link set dev virbr0 down
+    sudo ip link del dev virbr0
+    sudo ip link add virbr0 type bridge
+    sudo ip address add 172.44.0.1/24 dev virbr0
+    sudo ip link set dev virbr0 up
+}
+
+run()
+{
+    #_setup_networking
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    #kraft run -M 512 -b virbr0 "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- /redis.conf"
+    kraft run
+    popd > /dev/null
+}
+
+run_qemu()
+{
+    #_setup_networking
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -kernel "build/helloworld_kvm-x86_64" \
+        -cpu host \
+        -enable-kvm \
+        -nographic
+        #-fsdev local,id=myid,path=$(pwd)/fs0,security_model=none \
+        #-device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off \
+        #-netdev bridge,id=en0,br=virbr0 \
+        #-device virtio-net-pci,netdev=en0 \
+        #-append "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- /redis.conf" \
+        #-m 512M \
+    popd > /dev/null
+}
+
+if test $# -ne 1; then
+    echo "Usage: $0 <command>" 1>&2
+    echo "  command: setup build clean run run_qemu remove" 1>&2
+    exit 1
+fi
+
+command="$1"
+
+case "$command" in
+
+    "setup")
+        setup
+        ;;
+
+    "build")
+        build
+        ;;
+
+    "clean")
+        clean
+        ;;
+
+    "run")
+        run
+        ;;
+
+    "run_qemu")
+        run_qemu
+        ;;
+
+    "remove")
+        remove
+        ;;
+
+    *)
+        echo "Unknown command"
+        exit 1
+esac
