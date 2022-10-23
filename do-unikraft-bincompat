@@ -1,0 +1,147 @@
+#!/bin/bash
+
+top=unikraft-bincompat
+libs="$top"/libs
+apps="$top"/apps
+uk="$top"/unikraft
+app="$apps"/app-elfloader
+
+setup()
+{
+    mkdir -p "$top"
+    mkdir -p "$libs"
+    mkdir -p "$apps"
+
+    git clone https://github.com/unikraft/unikraft "$uk"
+
+    pushd "$uk" > /dev/null
+    git remote add razvand-bincompat https://github.com/razvand/unikraft-bincompat
+    git fetch razvand-bincompat
+    git checkout -b bin-compat razvand-bincompat/bin-compat
+    popd > /dev/null
+
+    git clone https://github.com/unikraft/app-elfloader "$app"
+
+    pushd "$app" > /dev/null
+    git checkout -b lyon-hackathon origin/lyon-hackathon
+    popd > /dev/null
+
+    git clone https://github.com/unikraft/lib-libelf "$libs"/libelf
+    git clone https://github.com/unikraft/lib-zydis "$libs"/zydis
+    git clone https://github.com/unikraft/lib-lwip "$libs"/lwip
+
+    pushd "$libs"/lwip > /dev/null
+    git remote add razvand https://github.com/razvand/lib-lwip
+    git fetch razvand
+    git checkout -b lyon-hackathon razvand/lyon-hackathon
+    popd > /dev/null
+
+    git clone https://github.com/unikraft/run-app-elfloader "$apps"/run-app-elfloader
+    git clone https://github.com/unikraft/static-pie-apps "$apps"/static-pie-apps
+}
+
+build()
+{
+    pushd "$app" > /dev/null
+    cp config/config .config
+    make
+    popd > /dev/null
+}
+
+build_debug()
+{
+    pushd "$app" > /dev/null
+    cp config/config_debug .config
+    make
+    popd > /dev/null
+}
+
+clean()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    make distclean
+    popd > /dev/null
+}
+
+remove()
+{
+    rm -fr "$top"
+}
+
+_setup_networking()
+{
+    sudo ip link set dev virbr0 down
+    sudo ip link del dev virbr0
+    sudo ip link add virbr0 type bridge
+    sudo ip address add 172.44.0.1/24 dev virbr0
+    sudo ip link set dev virbr0 up
+}
+
+run_helloworld()
+{
+    pushd "$apps"/run-app-elfloader > /dev/null
+    ./run_elfloader ../static-pie-apps/lang/c/helloworld
+    popd > /dev/null
+}
+
+run_helloworld_build()
+{
+    pushd "$apps"/run-app-elfloader > /dev/null
+    ./run_elfloader -k ../app-elfloader/build/app-elfloader_kvm-x86_64 ../static-pie-apps/lang/c/helloworld
+    popd > /dev/null
+}
+
+run_helloworld_build_debug()
+{
+    pushd "$apps"/run-app-elfloader > /dev/null
+    ./run_elfloader -k ../app-elfloader/build/app-elfloader_kvm-x86_64.dbg ../static-pie-apps/lang/c/helloworld
+    popd > /dev/null
+}
+
+if test $# -ne 1; then
+    echo "Usage: $0 <command>" 1>&2
+    echo "  command: setup build build_debug clean run run_build run_build_debug remove" 1>&2
+    exit 1
+fi
+
+command="$1"
+
+case "$command" in
+
+    "setup")
+        setup
+        ;;
+
+    "build")
+        build
+        ;;
+
+    "build_debug")
+        build_debug
+        ;;
+
+    "clean")
+        clean
+        ;;
+
+    "run")
+        run_helloworld
+        ;;
+
+    "run_build")
+        run_helloworld_build_debug
+        ;;
+
+    "run_build_debug")
+        run_helloworld_build_debug
+        ;;
+
+    "remove")
+        remove
+        ;;
+
+    *)
+        echo "Unknown command"
+        exit 1
+esac

@@ -324,3 +324,124 @@ Pass required commands to script:
    ```
 
    The image prints the `Hello, world!` message.
+
+## Binary Compatibility
+
+Use the `do-unikraft-bincompat` to set up, build and run [`app-elfloader`](github.com/unikraft/app-elfloader) and other support repositories with Unikraft.
+Run the script anywhere.
+It will create a conventional local file hierarchy for building the Unikraft image.
+Repositories will be moved to the corresponding branch.
+
+Pass required commands to script:
+
+1. First, set up repositories:
+
+   ```
+   $ ./do-unikraft-bincompat setup
+   ```
+
+   This results in creating the `unikraft-bincompat/` folder with the file hierarchy:
+
+   ```
+   $ tree -L 2 unikraft-bincompat/
+   unikraft-bincompat/
+   |-- apps
+   |   |-- app-elfloader
+   |   |-- run-app-elfloader
+   |   `-- static-pie-apps
+   |-- libs
+   |   |-- libelf
+   |   |-- lwip
+   |   `-- zydis
+   `-- unikraft
+       |-- arch
+       |-- CODING_STYLE.md
+       |-- Config.uk
+       |-- CONTRIBUTING.md
+       |-- COPYING.md
+       |-- doc
+       |-- include
+       |-- lib
+       |-- Makefile
+       |-- Makefile.uk
+       |-- plat
+       |-- README.md
+       |-- support
+       `-- version.mk
+   ```
+
+1. Run the `helloworld` static PIE in Unikraft using the prebuilt `app-elfloader` Unikraft image:
+
+   ```
+   $ ./do-unikraft-bincompat run
+   Powered by
+   o.   .o       _ _               __ _
+   Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+   oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
+   oOo oOO| | | | |   (| | | (_) |  _) :_
+    OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
+               Mimas 0.7.0~1e17a9c8-custom
+   Hello, World!
+   ```
+
+1. Build the `app-elfloader` Unikraft image:
+
+   ```
+   $ ./do-unikraft-bincompat build
+     [...]
+     LD      app-elfloader_kvm-x86_64.ld.o
+     OBJCOPY app-elfloader_kvm-x86_64.o
+     LD      app-elfloader_kvm-x86_64.dbg
+     SCSTRIP app-elfloader_kvm-x86_64
+     GZ      app-elfloader_kvm-x86_64.gz
+   ```
+
+1. Run the `helloworld` static PIE in Unikraft using the newly built `app-elfloader` Unikraft image:
+
+   ```
+   $ ./do-unikraft-bincompat run_build
+   Powered by
+   o.   .o       _ _               __ _
+   Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+   oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
+   oOo oOO| | | | |   (| | | (_) |  _) :_
+    OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
+                       Mimas 0.7.0~bbb00c7
+   Hello, World!
+   ```
+
+1. Clean the built image:
+
+   ```
+   $ ./do-unikraft-bincompat clean
+     [...]
+     RM      build/
+     RM      config
+     [...]
+   ```
+
+1. Build the `app-elfloader` Unikraft debug image:
+
+   ```
+   $ ./do-unikraft-bincompat build_debug
+     [...]
+
+     LD      app-elfloader_kvm-x86_64.ld.o
+     OBJCOPY app-elfloader_kvm-x86_64.o
+     LD      app-elfloader_kvm-x86_64.dbg
+     SCSTRIP app-elfloader_kvm-x86_64
+     GZ      app-elfloader_kvm-x86_64.gz
+     LN      app-elfloader_kvm-x86_64.dbg.gdb.py
+     [...]
+   ```
+
+1. Run the `helloworld` static PIE in Unikraft using the newly built `app-elfloader` Unikraft debug image:
+
+   ```
+   $ ./do-unikraft-bincompat run_build_debug
+   [...]
+   [    0.410842] dbg:  [libvfscore] <main.c @  703> (ssize_t) uk_syscall_r_writev((int) 0x1, (const struct iovec *) 0x3ff8f8d8, (int) 0x1)
+   Hello, World!
+   [    0.413533] dbg:  [libsyscall_shim] <uk_syscall_binary.c @   76> Binary system call request "exit_group" (231) at ip:0x3fe51156 (arg0=0x0, arg1=0x3c, ...)
+   [...]
+   ```
