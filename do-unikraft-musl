@@ -6,6 +6,8 @@ apps="$top"/apps
 uk="$top"/unikraft
 app="$top"/apps/app-helloworld
 
+USE_LWIP=1
+
 setup_unikraft()
 {
     # Use Simon's scheduling branch.
@@ -34,7 +36,11 @@ setup_app()
     # Use updated kraft.yaml (including Musl dependency).
     git remote add upb https://github.com/unikraft-upb/app-helloworld
     git fetch upb
-    git checkout -b use-musl upb/use-musl
+    if test "$USE_LWIP" -eq 1; then
+        git checkout -b use-lwip upb/use-lwip
+    else
+        git checkout -b use-musl upb/use-musl
+    fi
 }
 
 setup_musl()
