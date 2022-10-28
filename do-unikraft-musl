@@ -58,10 +58,24 @@ setup_musl()
     git checkout -b patch-CVE-2020-28928 kubanrob/patch-CVE-2020-28928
     git checkout -b hide-internal-headers kubanrob/hide-internal-headers
 
+    # Integrate build PRs: #15, #17
+    git checkout -b parallel-make kubanrob/parallel-make
+    git checkout -b dont_clean_includes kubanrob/dont_clean_includes
+
+    # Integrate PR #14:  Enable FPSIMD support on ARM64
+    git remote add razvanvirtan https://github.com/razvanvirtan/lib-musl/
+    git fetch razvanvirtan
+    git checkout -b enable_fpsimd razvanvirtan/enable_fpsimd
+
     # Integrate PR #12: Add syscall wrapper for getrandom
     git remote add michpappas https://github.com/michpappas/lib-musl/
     git fetch michpappas
     git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
+
+    # Integrate PR #18: Always include the uname sources
+    git remote add StefanJum https://github.com/StefanJum/lib-musl/
+    git fetch StefanJum
+    git checkout -b fix-posix-sysinfo StefanJum/fix-posix-sysinfo
 
     # Rebase all branches
     git checkout -b musl-support staging
@@ -71,6 +85,12 @@ setup_musl()
     #git rebase patch-CVE-2020-28928
     git rebase hide-internal-headers
     #git rebase add_syscall_wrapper_for_getrandom
+    git cherry-pick parallel-make
+    git cherry-pick enable_fpsimd
+    git rebase dont_clean_includes
+    # This conflicts so it by hand.
+    #git rebase fix-posix-sysinfo
+    sed -i -e '78d' -e '80d' Makefile.uk.musl.misc
 }
 
 setup_lwip()
