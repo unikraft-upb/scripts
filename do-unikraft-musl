@@ -77,6 +77,11 @@ setup_musl()
     git fetch StefanJum
     git checkout -b fix-posix-sysinfo StefanJum/fix-posix-sysinfo
 
+    # Integrate PR #19: Integration with LWIP
+    git remote add upb https://github.com/unikraft-upb/lib-musl/
+    git fetch upb
+    git checkout -b makefile-lwip-integration upb/makefile-lwip-integration
+
     # Rebase all branches
     git checkout -b musl-support staging
     git rebase thread_support
@@ -88,6 +93,7 @@ setup_musl()
     git cherry-pick parallel-make
     git cherry-pick enable_fpsimd
     git rebase dont_clean_includes
+    git cherry-pick makefile-lwip-integration
     # This conflicts so it by hand.
     #git rebase fix-posix-sysinfo
     sed -i -e '78d' -e '80d' Makefile.uk.musl.misc
@@ -105,10 +111,16 @@ setup_lwip()
     git fetch upb
     git checkout -b fix-__unused upb/fix-__unused
 
+    # Integrate PR #23: Add Musl support
+    git remote add upb https://github.com/unikraft-upb/lib-lwip
+    git fetch upb
+    git checkout -b musl-support upb/musl-support
+
     # Rebase all branches
     git checkout staging
     git rebase skuenzer/sched-refactor
     git rebase fix-__unused
+    git cherry-pick musl-support
 }
 
 setup()
