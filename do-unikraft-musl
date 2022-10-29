@@ -157,7 +157,7 @@ build()
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
     kraft configure -F -m x86_64 -p kvm
-    kraft build
+    kraft build -j $(nproc)
     popd > /dev/null
 }
 

@@ -44,7 +44,7 @@ build()
 {
     pushd "$app" > /dev/null
     cp config/config .config
-    make
+    make -j $(nproc)
     popd > /dev/null
 }
 
@@ -52,7 +52,7 @@ build_debug()
 {
     pushd "$app" > /dev/null
     cp config/config_debug .config
-    make
+    make -j $(nproc)
     popd > /dev/null
 }
 
