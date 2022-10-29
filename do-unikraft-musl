@@ -106,7 +106,7 @@ setup_lwip()
     git fetch skuenzer
     git checkout -b skuenzer/sched-refactor skuenzer/skuenzer/sched-refactor
 
-    # Integrate PR #20: Add uk/essentials.h as include dependency
+    # Integrate PR #22: Add uk/essentials.h as include dependency
     git remote add upb https://github.com/unikraft-upb/lib-lwip
     git fetch upb
     git checkout -b fix-__unused upb/fix-__unused
