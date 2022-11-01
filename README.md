@@ -259,72 +259,6 @@ Pass required commands to script:
    172.44.0.2:6379>
    ```
 
-## Musl Build
-
-Use the `do-unikraft-musl` to set up, build and run [`app-helloworld`](https://github.com/unikraft/app-helloworld) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
-Note that Musl is not actually used, since the internal [`nolibc` library](https://github.com/unikraft/unikraft/tree/staging/lib/nolibc) has all required features;
-it is however built and integrated into the final image.
-[lwip](https://github.com/unikraft/lib-lwip) is cloned and set up but not used to build `app-helloworld`.
-Run the script anywhere.
-It will create a conventional local file hierarchy for building the Unikraft image.
-
-Pass required commands to script:
-
-1. First, set up repositories:
-
-   ```
-   $ ./do-unikraft-musl setup
-   ```
-
-   This results in creating the `unikraft-musl/` folder with the local conventional file hierarchy:
-
-   ```
-   $ tree -L 2 unikraft-musl/
-   unikraft-musl/
-   |-- apps
-   |   `-- app-helloworld
-   |-- archs
-   |-- libs
-   |   |-- lwip
-   |   `-- musl
-   |-- plats
-   `-- unikraft
-   [...]
-   ```
-
-1. Build the hellworld Unikraft image:
-
-   ```
-   $ ./do-unikraft-musl build
-
-   [...]
-   Successfully built unikernels:
-
-     => build/helloworld-x86_64
-     => build/helloworld_kvm-x86_64.dbg (with symbols)
-
-   To instantiate, use: kraft run
-   ```
-
-1. Run the hellworld Unikraft image:
-
-   ```
-   $ ./do-unikraft-musl run
-
-   [...]
-   Booting from ROM...
-   Powered by
-   o.   .o       _ _               __ _
-   Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
-   oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
-   oOo oOO| | | | |   (| | | (_) |  _) :_
-    OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
-                    Phoebe 0.10.0~43989277
-   Hello, world!
-   ```
-
-   The image prints the `Hello, world!` message.
-
 ## Binary Compatibility
 
 Use the `do-unikraft-bincompat` to set up, build and run [`app-elfloader`](github.com/unikraft/app-elfloader) and other support repositories with Unikraft.
@@ -445,3 +379,7 @@ Pass required commands to script:
    [    0.413533] dbg:  [libsyscall_shim] <uk_syscall_binary.c @   76> Binary system call request "exit_group" (231) at ip:0x3fe51156 (arg0=0x0, arg1=0x3c, ...)
    [...]
    ```
+
+## Musl Build
+
+See the [`musl/` directory](./musl/).
