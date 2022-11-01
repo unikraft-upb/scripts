@@ -1,0 +1,41 @@
+#!/bin/bash
+
+if test $# -ne 1; then
+    echo "Usage: $0 <command>" 1>&2
+    echo "  command: setup build clean run run_qemu remove" 1>&2
+    exit 1
+fi
+
+command="$1"
+
+case "$command" in
+
+    "setup")
+        setup
+        setup_app
+        ;;
+
+    "build")
+        build
+        ;;
+
+    "clean")
+        clean
+        ;;
+
+    "run")
+        run
+        ;;
+
+    "run_qemu")
+        run_qemu
+        ;;
+
+    "remove")
+        remove
+        ;;
+
+    *)
+        echo "Unknown command"
+        exit 1
+esac

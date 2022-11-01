@@ -1,13 +1,5 @@
 #!/bin/bash
 
-top=unikraft-musl
-libs="$top"/libs
-apps="$top"/apps
-uk="$top"/unikraft
-app="$top"/apps/app-helloworld
-
-USE_LWIP=1
-
 setup_unikraft()
 {
     # Use Simon's scheduling branch.
@@ -29,18 +21,6 @@ setup_unikraft()
     git remote add upb https://github.com/unikraft-upb/unikraft
     git fetch upb
     git checkout -b musl-support upb/musl-support
-}
-
-setup_app()
-{
-    # Use updated kraft.yaml (including Musl dependency).
-    git remote add upb https://github.com/unikraft-upb/app-helloworld
-    git fetch upb
-    if test "$USE_LWIP" -eq 1; then
-        git checkout -b use-lwip upb/use-lwip
-    else
-        git checkout -b use-musl upb/use-musl
-    fi
 }
 
 setup_musl()
@@ -85,10 +65,15 @@ setup_musl()
     # Rebase all branches
     git checkout -b musl-support staging
     git rebase thread_support
-    git rebase add-patches-for-aarch64
-    git rebase update-aarch64-makefiles
+    git cherry-pick add-patches-for-aarch64~3
+    git cherry-pick add-patches-for-aarch64~2
+    git cherry-pick add-patches-for-aarch64~1
+    git cherry-pick add-patches-for-aarch64
+    git cherry-pick update-aarch64-makefiles~2
+    git cherry-pick update-aarch64-makefiles~1
+    git cherry-pick update-aarch64-makefiles
     #git rebase patch-CVE-2020-28928
-    git rebase hide-internal-headers
+    git cherry-pick hide-internal-headers
     #git rebase add_syscall_wrapper_for_getrandom
     git cherry-pick parallel-make
     git cherry-pick enable_fpsimd
@@ -123,40 +108,112 @@ setup_lwip()
     git cherry-pick musl-support
 }
 
+setup_libcxx()
+{
+    # Integrate PR #19: [DO NOT MERGE]: PR for testing libcxx with musl #19
+    git remote add upb https://github.com/unikraft-upb/lib-libcxx
+    git fetch upb
+    git checkout -b remove-math-func upb/remove-math-func
+
+    git checkout staging
+    git rebase remove-math-func
+}
+
+setup_libcxxabi()
+{
+    # Integrate PR #2: Config.uk: Fix dependencies with libunwind
+    git remote add upb https://github.com/unikraft-upb/lib-libcxxabi
+    git fetch upb
+    git checkout -b fix-libunwind-dep upb/fix-libunwind-dep
+
+    git checkout staging
+    git rebase fix-libunwind-dep
+}
+
+setup_libunwind()
+{
+    # Integrate PR #3: Config.uk: Fix dependencies with libcxxabi
+    git remote add upb https://github.com/unikraft-upb/lib-libunwind
+    git fetch upb
+    git checkout -b fix-libcxxabi-dep upb/fix-libcxxabi-dep
+
+    git checkout staging
+    git rebase fix-libcxxabi-dep
+}
+
+setup_compiler_rt()
+{
+    # Integrate PR #8: Circular dependencies if adding libunwind as dependency
+    git remote add DeliaPavel https://github.com/DeliaPavel/lib-compiler-rt
+    git fetch DeliaPavel
+    git checkout -b DeliaPavel-staging DeliaPavel/staging
+
+    git checkout staging
+    git rebase DeliaPavel-staging
+}
+
 setup()
 {
     mkdir -p "$top"
     mkdir -p "$libs"
     mkdir -p "$apps"
 
-    git clone https://github.com/unikraft/unikraft "$uk"
+    if test ! -d "$uk"; then
+        git clone https://github.com/unikraft/unikraft "$uk"
+        pushd "$uk" > /dev/null
+        setup_unikraft
+        popd > /dev/null
+    fi
 
-    git clone https://github.com/unikraft/app-helloworld "$app"
-    git clone https://github.com/unikraft/lib-musl "$libs"/musl
-    git clone https://github.com/unikraft/lib-lwip "$libs"/lwip
+    if test ! -d "$libs"/musl; then
+        git clone https://github.com/unikraft/lib-musl "$libs"/musl
+        pushd "$libs"/musl > /dev/null
+        setup_musl
+        popd > /dev/null
+    fi
 
-    pushd "$uk" > /dev/null
-    setup_unikraft
-    popd > /dev/null
+    if test ! -d "$libs"/lwip; then
+        git clone https://github.com/unikraft/lib-lwip "$libs"/lwip
+        pushd "$libs"/lwip > /dev/null
+        setup_lwip
+        popd > /dev/null
+    fi
 
-    pushd "$app" > /dev/null
-    setup_app
-    popd > /dev/null
+    if test ! -d "$libs"/libcxx; then
+        git clone https://github.com/unikraft/lib-libcxx "$libs"/libcxx
+        pushd "$libs"/libcxx > /dev/null
+        setup_libcxx
+        popd > /dev/null
+    fi
 
-    pushd "$libs"/musl > /dev/null
-    setup_musl
-    popd > /dev/null
+    if test ! -d "$libs"/libcxxabi; then
+        git clone https://github.com/unikraft/lib-libcxxabi "$libs"/libcxxabi
+        pushd "$libs"/libcxxabi > /dev/null
+        setup_libcxxabi
+        popd > /dev/null
+    fi
 
-    pushd "$libs"/lwip > /dev/null
-    setup_lwip
-    popd > /dev/null
+    if test ! -d "$libs"/libunwind; then
+        git clone https://github.com/unikraft/lib-libunwind "$libs"/libunwind
+        pushd "$libs"/libunwind > /dev/null
+        setup_libunwind
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/compiler-rt; then
+        git clone https://github.com/unikraft/lib-compiler-rt "$libs"/compiler-rt
+        pushd "$libs"/compiler-rt > /dev/null
+        setup_compiler_rt
+        popd > /dev/null
+    fi
 }
 
 build()
 {
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
-    kraft configure -F -m x86_64 -p kvm
+    # Do not use LIBUKSIGNAL with Musl.
+    kraft configure -n LIBUKSIGNAL -F -m x86_64 -p kvm
     kraft build -j $(nproc)
     popd > /dev/null
 }
@@ -182,70 +239,3 @@ _setup_networking()
     sudo ip address add 172.44.0.1/24 dev virbr0
     sudo ip link set dev virbr0 up
 }
-
-run()
-{
-    #_setup_networking
-    pushd "$app" > /dev/null
-    export UK_WORKDIR=$(pwd)/../../
-    #kraft run -M 512 -b virbr0 "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- /redis.conf"
-    kraft run
-    popd > /dev/null
-}
-
-run_qemu()
-{
-    #_setup_networking
-    pushd "$app" > /dev/null
-    sudo qemu-system-x86_64 \
-        -kernel "build/helloworld_kvm-x86_64" \
-        -cpu host \
-        -enable-kvm \
-        -nographic
-        #-fsdev local,id=myid,path=$(pwd)/fs0,security_model=none \
-        #-device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off \
-        #-netdev bridge,id=en0,br=virbr0 \
-        #-device virtio-net-pci,netdev=en0 \
-        #-append "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- /redis.conf" \
-        #-m 512M \
-    popd > /dev/null
-}
-
-if test $# -ne 1; then
-    echo "Usage: $0 <command>" 1>&2
-    echo "  command: setup build clean run run_qemu remove" 1>&2
-    exit 1
-fi
-
-command="$1"
-
-case "$command" in
-
-    "setup")
-        setup
-        ;;
-
-    "build")
-        build
-        ;;
-
-    "clean")
-        clean
-        ;;
-
-    "run")
-        run
-        ;;
-
-    "run_qemu")
-        run_qemu
-        ;;
-
-    "remove")
-        remove
-        ;;
-
-    *)
-        echo "Unknown command"
-        exit 1
-esac
