@@ -115,8 +115,15 @@ setup_libcxx()
     git fetch upb
     git checkout -b remove-math-func upb/remove-math-func
 
+    # Integrate PR #21: Define strtof_l and strtod_l in locale (aarch64)
+    git remote add mariasfiraiala https://github.com/mariasfiraiala/lib-libcxx
+    git fetch mariasfiraiala
+    git checkout -b patch-locale mariasfiraiala/patch-locale
+
+    # Rebase all branches.
     git checkout staging
     git rebase remove-math-func
+    git cherry-pick patch-locale
 }
 
 setup_libcxxabi()
