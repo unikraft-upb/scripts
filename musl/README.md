@@ -135,3 +135,24 @@ A confirmation message is also shown by the Unikraft server in its console:
 [...]
 Sent a reply
 ```
+
+## test
+
+Use the `do-test` script to build and run the custom tests from [Dragoș's repository](https://github.com/dragosargint/test);
+they test the clone system call and new thread support in Unikraft.
+
+Follow the exact same steps as above, but replace `helloworld` with `test` throughout commands to use.
+
+Using the `run` command prints out an extensive output (debugging is enable).
+The relevant lines are red `ERR` lines.
+As long as they mention `GOOD` in the message, everything is OK:
+
+```
+$ ./do_test run
+[...]
+[    9.997356] ERR:  <init> {r:0x10e9e1,f:0x7f968f0} [test] <test_pr_566_pthread_basic.c @   13> GOOD: Argument arrived correctly in thread_fun()
+[...]
+[   10.147727] ERR:  <init> {r:0x10ebd1,f:0x7fdff30} [test] <test_pr_566_pthread_basic.c @   34> GOOD: Self reference for pthread threads works
+[   10.167965] ERR:  <init> {r:0x10ec43,f:0x7fdff30} [test] <test_pr_566_pthread_basic.c @   41> GOOD: The returned value from the thread_fun si correct
+[...]
+```
