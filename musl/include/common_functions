@@ -21,6 +21,17 @@ setup_unikraft()
     git remote add upb https://github.com/unikraft-upb/unikraft
     git fetch upb
     git checkout -b musl-support upb/musl-support
+
+    # Integrate PRs 553 and 602.
+    git remote add maniatro111 https://github.com/maniatro111/unikraft/
+    git fetch maniatro111
+    git checkout -b clone-rule maniatro111/clone-rule
+    git checkout -b disable-uktest-test-myself-suite-when-option-is-disabled maniatro111/disable-uktest-test-myself-suite-when-option-is-disabled
+
+    git checkout staging
+    git rebase musl-support
+    git rebase clone-rule
+    git rebase disable-uktest-test-myself-suite-when-option-is-disabled
 }
 
 setup_musl()
@@ -159,6 +170,17 @@ setup_compiler_rt()
     git rebase DeliaPavel-staging
 }
 
+setup_libc_test()
+{
+    # Integrate PR #1:  Introduce liblibctest for Unikraft
+    git remote add maniatro111 https://github.com/maniatro111/lib-libctest
+    git fetch maniatro111
+    git checkout -b maniatro111-staging maniatro111/staging
+
+    git checkout staging
+    git rebase maniatro111-staging
+}
+
 setup()
 {
     mkdir -p "$top"
@@ -211,6 +233,13 @@ setup()
         git clone https://github.com/unikraft/lib-compiler-rt "$libs"/compiler-rt
         pushd "$libs"/compiler-rt > /dev/null
         setup_compiler_rt
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/libc-test; then
+        git clone https://github.com/unikraft/lib-libc-test "$libs"/libc-test
+        pushd "$libs"/libc-test > /dev/null
+        setup_libc_test
         popd > /dev/null
     fi
 }

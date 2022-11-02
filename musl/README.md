@@ -148,11 +148,30 @@ The relevant lines are red `ERR` lines.
 As long as they mention `GOOD` in the message, everything is OK:
 
 ```
-$ ./do_test run
+$ ./do-test run
 [...]
 [    9.997356] ERR:  <init> {r:0x10e9e1,f:0x7f968f0} [test] <test_pr_566_pthread_basic.c @   13> GOOD: Argument arrived correctly in thread_fun()
 [...]
 [   10.147727] ERR:  <init> {r:0x10ebd1,f:0x7fdff30} [test] <test_pr_566_pthread_basic.c @   34> GOOD: Self reference for pthread threads works
 [   10.167965] ERR:  <init> {r:0x10ec43,f:0x7fdff30} [test] <test_pr_566_pthread_basic.c @   41> GOOD: The returned value from the thread_fun si correct
+[...]
+```
+
+## libc-test
+
+Use the `libc-test` script to build and run tests in the [`libc-test` repository](https://github.com/unikraft/lib-libc-test).
+They test the interface of Musl (and, presumably, other standard C libraries).
+
+Follow the exact same steps as above, but replace `helloworld` with `libc-test` throughout commands to use.
+
+The `run` command triggers the execution of tests.
+
+```
+$ ./do-libc-test run
+[...]
+test: uk_libc_testsuite->string_memcpy_tests
+    :   expected `test_align(i,j,k)` to be 0 and was 0 .................................. [ PASSED ]
+    :   expected `test_align(i,j,k)` to be 0 and was 0 .................................. [ PASSED ]
+    :   expected `test_align(i,j,k)` to be 0 and was 0 .................................. [ PASSED ]
 [...]
 ```
