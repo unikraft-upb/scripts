@@ -127,20 +127,24 @@ setup_lwip()
 
 setup_libcxx()
 {
-    # Integrate PR #19: [DO NOT MERGE]: PR for testing libcxx with musl #19
+    # Integrate PRs #9, #10, #14, #17, #18, #22.
     git remote add upb https://github.com/unikraft-upb/lib-libcxx
     git fetch upb
-    git checkout -b remove-math-func upb/remove-math-func
-
-    # Integrate PR #21: Define strtof_l and strtod_l in locale (aarch64)
-    git remote add mariasfiraiala https://github.com/mariasfiraiala/lib-libcxx
-    git fetch mariasfiraiala
-    git checkout -b patch-locale mariasfiraiala/patch-locale
+    git checkout -b fix-features upb/fix-features
+    git checkout -b fix-xlocale upb/fix-xlocale
+    git checkout -b patch-locale upb/patch-locale
+    git checkout -b fix-glue upb/fix-glue
+    git checkout -b change-include-next upb/change-include-next
+    git checkout -b add-math-header upb/add-math-header
 
     # Rebase all branches.
     git checkout staging
-    git rebase remove-math-func
-    git cherry-pick patch-locale
+    git rebase fix-features
+    git rebase fix-xlocale
+    git rebase patch-locale
+    git rebase fix-glue
+    git rebase change-include-next
+    git rebase add-math-header
 }
 
 setup_libcxxabi()
