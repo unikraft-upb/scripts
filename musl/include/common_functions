@@ -69,15 +69,16 @@ setup_musl()
     git fetch michpappas
     git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
 
-    # Integrate PR #18: Always include the uname sources
+    # Integrate PRs #18: Always include the uname sources
     git remote add StefanJum https://github.com/StefanJum/lib-musl/
     git fetch StefanJum
     git checkout -b fix-posix-sysinfo StefanJum/fix-posix-sysinfo
 
-    # Integrate PR #19: Integration with LWIP
+    # Integrate PR #19, #20
     git remote add upb https://github.com/unikraft-upb/lib-musl/
     git fetch upb
     git checkout -b makefile-lwip-integration upb/makefile-lwip-integration
+    git checkout -b posix-user-sources upb/posix-user-sources
 
     # Rebase all branches
     git checkout -b musl-support staging
@@ -89,16 +90,15 @@ setup_musl()
     git cherry-pick update-aarch64-makefiles~2
     git cherry-pick update-aarch64-makefiles~1
     git cherry-pick update-aarch64-makefiles
-    #git rebase patch-CVE-2020-28928
+    git cherry-pick patch-CVE-2020-28928
+    git cherry-pick add_syscall_wrapper_for_getrandom
     git cherry-pick hide-internal-headers
-    #git rebase add_syscall_wrapper_for_getrandom
     git cherry-pick parallel-make
     git cherry-pick enable_fpsimd
     git rebase dont_clean_includes
+    git cherry-pick fix-posix-sysinfo
     git cherry-pick makefile-lwip-integration
-    # This conflicts so it by hand.
-    #git rebase fix-posix-sysinfo
-    sed -i -e '78d' -e '80d' Makefile.uk.musl.misc
+    git cherry-pick posix-user-sources
 }
 
 setup_lwip()
