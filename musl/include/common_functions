@@ -191,6 +191,17 @@ setup_libc_test()
     git rebase maniatro111-staging
 }
 
+setup_libsodium()
+{
+    # Integrate PR #6: Add the internal 'posix-event' library as a dependency
+    git remote add hchandad https://github.com/hchandad/unikraft-libsodium-port/
+    git fetch hchandad
+    git checkout -b add-posix-event hchandad/add-posix-event
+
+    git checkout staging
+    git rebase add-posix-event
+}
+
 setup()
 {
     mkdir -p "$top"
@@ -250,6 +261,13 @@ setup()
         git clone https://github.com/unikraft/lib-libc-test "$libs"/libc-test
         pushd "$libs"/libc-test > /dev/null
         setup_libc_test
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/libsodium; then
+        git clone https://github.com/unikraft/lib-libsodium "$libs"/libsodium
+        pushd "$libs"/libsodium > /dev/null
+        setup_libsodium
         popd > /dev/null
     fi
 }

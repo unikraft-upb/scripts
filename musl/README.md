@@ -159,7 +159,7 @@ $ ./do-test run
 
 ## libc-test
 
-Use the `libc-test` script to build and run tests in the [`libc-test` repository](https://github.com/unikraft/lib-libc-test).
+Use the `do-libc-test` script to build and run tests in the [`libc-test` repository](https://github.com/unikraft/lib-libc-test).
 They test the interface of Musl (and, presumably, other standard C libraries).
 
 Follow the exact same steps as above, but replace `helloworld` with `libc-test` throughout commands to use.
@@ -173,5 +173,32 @@ test: uk_libc_testsuite->string_memcpy_tests
     :   expected `test_align(i,j,k)` to be 0 and was 0 .................................. [ PASSED ]
     :   expected `test_align(i,j,k)` to be 0 and was 0 .................................. [ PASSED ]
     :   expected `test_align(i,j,k)` to be 0 and was 0 .................................. [ PASSED ]
+[...]
+```
+
+## libsodium
+
+Use the `do-libsodium` script to build and run tests in the [`lib-libsodium` repository](https://github.com/unikraft/lib-libsodium).
+The script builds libsodium together with Musl.
+
+Follow the exact same steps as above, but replace `helloworld` with `libsodium` throughout commands to use.
+
+The `run` command triggers the execution of tests.
+
+```
+$ ./do-libc-test run
+[...]
+test: libsodium_minimal_testsuite->uktest_test_aead_aes256gcm
+    :   expected `uk_sodium_cmptest(&aead_aes256gcm)` to be 0 and was 0 ................. [ PASSED ]
+test: libsodium_minimal_testsuite->uktest_test_aead_aes256gcm2
+    :   expected `uk_sodium_cmptest(&aead_aes256gcm2)` to be 0 and was 0 ................ [ PASSED ]
+test: libsodium_minimal_testsuite->uktest_test_aead_chacha20poly1305
+    :   expected `uk_sodium_cmptest(&aead_chacha20poly1305)` to be 0 and was 0 .......... [ PASSED ]
+test: libsodium_minimal_testsuite->uktest_test_aead_chacha20poly13052
+    :   expected `uk_sodium_cmptest(&aead_chacha20poly13052)` to be 0 and was 0 ......... [ PASSED ]
+test: libsodium_minimal_testsuite->uktest_test_aead_xchacha20poly1305
+    :   expected `uk_sodium_cmptest(&aead_xchacha20poly1305)` to be 0 and was 0 ......... [ PASSED ]
+test: libsodium_minimal_testsuite->uktest_test_auth                                                 
+    :   expected `uk_sodium_cmptest(&auth)` to be 0 and was 0 ........................... [ PASSED ]
 [...]
 ```
