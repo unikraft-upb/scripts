@@ -256,6 +256,7 @@ build()
     export UK_WORKDIR=$(pwd)/../../
     # Do not use LIBUKSIGNAL with Musl.
     kraft configure -n LIBUKSIGNAL -F -m x86_64 -p kvm
+    kraft prepare
     kraft build -j $(nproc)
     popd > /dev/null
 }
