@@ -1,5 +1,7 @@
 #!/bin/bash
 
+need_x86_uktest=1
+
 setup_unikraft()
 {
     # Use Simon's scheduling branch.
@@ -28,10 +30,12 @@ setup_unikraft()
     git checkout -b clone-rule maniatro111/clone-rule
     git checkout -b disable-uktest-test-myself-suite-when-option-is-disabled maniatro111/disable-uktest-test-myself-suite-when-option-is-disabled
 
-    # Integrate PR 606, fixing ARM runs.
-    git remote add alexhoppus https://github.com/alexhoppus/unikraft/
-    git fetch alexhoppus
-    git checkout -b bugfix/uktest_perm_ro alexhoppus/bugfix/uktest_perm_ro
+    if test ! "$need_x86_uktest" -eq 1; then
+        # Integrate PR 606, fixing ARM runs.
+        git remote add alexhoppus https://github.com/alexhoppus/unikraft/
+        git fetch alexhoppus
+        git checkout -b bugfix/uktest_perm_ro alexhoppus/bugfix/uktest_perm_ro
+    fi
 
     git checkout staging
     git rebase musl-support
