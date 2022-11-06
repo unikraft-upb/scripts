@@ -23,12 +23,32 @@ setup_unikraft()
     git remote add upb https://github.com/unikraft-upb/unikraft
     git fetch upb
     git checkout -b musl-support upb/musl-support
+    git checkout -b statfs_to_statvfs-in-macro-guard upb/statfs_to_statvfs-in-macro-guard
+    git checkout -b send-recv-guard upb/send-recv-guard
 
     # Integrate PRs 553 and 602.
     git remote add maniatro111 https://github.com/maniatro111/unikraft/
     git fetch maniatro111
     git checkout -b clone-rule maniatro111/clone-rule
     git checkout -b disable-uktest-test-myself-suite-when-option-is-disabled maniatro111/disable-uktest-test-myself-suite-when-option-is-disabled
+
+    # Integrate PR 551: Warning fix: uninitialized variable #551
+    git remote add mariamosn https://github.com/mariamosn/unikraft/
+    git fetch mariamosn
+    git checkout -b local2 mariamosn/local2
+
+    # Integrate PRs 638, 639
+    git remote add eduardvintila https://github.com/eduardvintila/unikraft/
+    git fetch eduardvintila
+    git checkout -b fix_open_call eduardvintila/fix_open_call
+    git checkout -b fix_pipe_call eduardvintila/fix_pipe_call
+    git checkout -b fix_9pfs_rw eduardvintila/fix_9pfs_rw
+
+    # Integrate PRs 636
+    git remote add mariasfiraiala https://github.com/mariasfiraiala/unikraft
+    git fetch mariasfiraiala
+    git checkout -b replace-access-call mariasfiraiala/replace-access-call
+    git checkout -b update-legacy_syscall.h mariasfiraiala/update-legacy_syscall.h
 
     if test ! "$need_x86_uktest" -eq 1; then
         # Integrate PR 606, fixing ARM runs.
@@ -39,9 +59,17 @@ setup_unikraft()
 
     git checkout staging
     git rebase musl-support
+    git rebase statfs_to_statvfs-in-macro-guard
+    git rebase send-recv-guard
     git rebase clone-rule
-    git rebase disable-uktest-test-myself-suite-when-option-is-disabled
-    git rebase bugfix/uktest_perm_ro
+    git cherry-pick disable-uktest-test-myself-suite-when-option-is-disabled
+    git cherry-pick bugfix/uktest_perm_ro
+    git cherry-pick local2
+    git cherry-pick fix_open_call
+    git cherry-pick fix_pipe_call
+    git cherry-pick fix_9pfs_rw
+    git cherry-pick replace-access-call
+    git cherry-pick update-legacy_syscall.h
 }
 
 setup_musl()
@@ -101,6 +129,8 @@ setup_musl()
     git cherry-pick enable_fpsimd
     git rebase dont_clean_includes
     git cherry-pick fix-posix-sysinfo
+    git cherry-pick makefile-lwip-integration~2
+    git cherry-pick makefile-lwip-integration~1
     git cherry-pick makefile-lwip-integration
     git cherry-pick posix-user-sources
 }
@@ -126,6 +156,7 @@ setup_lwip()
     git checkout staging
     git rebase skuenzer/sched-refactor
     git rebase fix-__unused
+    git cherry-pick musl-support~1
     git cherry-pick musl-support
 }
 
