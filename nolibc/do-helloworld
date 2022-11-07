@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# https://stackoverflow.com/a/246128/4804196
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    SOURCE=$(readlink "$SOURCE")
+    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPT_DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+source "$SCRIPT_DIR"/../include/base
+
+app="$top"/apps/app-helloworld
+
+source "$SCRIPT_DIR"/../include/common_functions
+
+USE_LWIP=0
+
+setup_app()
+{
+    git clone https://github.com/unikraft/app-helloworld "$app"
+
+    pushd "$app" > /dev/null
+
+    # Use updated kraft.yaml (including Musl dependency).
+    git remote add upb https://github.com/unikraft-upb/app-helloworld
+    git fetch upb
+    if test "$USE_LWIP" -eq 1; then
+        git checkout -b use-lwip-nolibc upb/use-lwip-nolibc
+    fi
+    # If no LWIP required, do nothing. Use the default build.
+
+    popd > /dev/null
+}
+
+run()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft run
+    popd > /dev/null
+}
+
+run_qemu()
+{
+    #_setup_networking
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -kernel "build/helloworld_kvm-x86_64" \
+        -cpu host \
+        -enable-kvm \
+        -nographic
+    popd > /dev/null
+}
+
+source "$SCRIPT_DIR"/../include/common_command
