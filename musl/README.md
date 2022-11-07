@@ -4,9 +4,9 @@ These are scripts for building applications with [Musl](http://musl.libc.org/) s
 They use the [Unikraft-ported `lib-musl`](https://github.com/unikraft/lib-musl) together with [ongoing PRs](https://github.com/unikraft/lib-musl/pulls).
 
 The top-level scripts (with the `do-` prefix) are the wrapper scripts to setup, build and run Unikraft applications (built with Musl support).
-They include common-part scripts in the `include/` directory.
+They include common-part scripts in the `../include/` directory.
 
-Applications, libraries and Unikraft are set up and built in the `workdir/` directory.
+Applications, libraries and Unikraft are set up and built in the `../workdir/` directory.
 
 ## app-helloworld
 
@@ -24,10 +24,10 @@ Pass required commands to script:
    $ ./do-helloworld setup
    ```
 
-   This results in creating the `workdir/` folder with the local conventional file hierarchy:
+   This results in creating the `../workdir/` folder with the local conventional file hierarchy:
 
    ```
-   $ tree -L 2 workdir/
+   $ tree -L 2 ../workdir/
    workdir/
    |-- apps
    |   `-- app-helloworld

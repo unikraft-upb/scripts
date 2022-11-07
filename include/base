@@ -1,6 +1,6 @@
 #!/bin/bash
 
-top=workdir
+top=../workdir
 libs="$top"/libs
 apps="$top"/apps
 uk="$top"/unikraft
