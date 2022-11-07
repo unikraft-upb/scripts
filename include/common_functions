@@ -431,6 +431,10 @@ setup()
         setup_nginx
         popd > /dev/null
     fi
+
+    if test ! -d "$libs"/micropython; then
+        git clone https://github.com/unikraft/lib-micropython "$libs"/micropython
+    fi
 }
 
 build()

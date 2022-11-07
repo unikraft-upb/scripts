@@ -136,6 +136,31 @@ A confirmation message is also shown by the Unikraft server in its console:
 Sent a reply
 ```
 
+## app-micropython
+
+Use the `do-micropython` script to build and run [`app-micropython`](https://github.com/unikraft/app-micropython.git) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Follow the exact same steps as above, but replace `helloworld` with `micropython` throughout commands to use.
+
+The `run` command runs the `helloworld.py` script in a MicroPython runtime.
+
+```
+./do-micropython run
+
+[...]
+SeaBIOS (version 1.10.2-1ubuntu1)
+Booting from ROM...
+Powered by
+o.   .o       _ _               __ _
+Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
+oOo oOO| | | | |   (| | | (_) |  _) :_
+ OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
+                 Phoebe 0.10.0~4eba7029
+/home/razvan/Documents/Unikraft/test_musl/workdir/apps/app-micropython/build/micropython_kvm-x86_64: can't open file 'console=ttyS0': [Errno 20] Not a directory
+Hello, world!
+Console terminated, terminating guest (PID: 11461)...
+```
+
 ## test
 
 Use the `do-test` script to build and run the custom tests from [Dragoș's repository](https://github.com/dragosargint/test);
