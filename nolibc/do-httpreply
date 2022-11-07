@@ -17,9 +17,16 @@ source "$SCRIPT_DIR"/../include/common_functions
 
 setup_app()
 {
-    git clone https://github.com/unikraft/app-httpreply "$app"
+    if ! test -d "$app"; then
+        git clone https://github.com/unikraft/app-httpreply "$app"
+    fi
+
+    pushd "$app" > /dev/null
 
     # Don't do anything else. The default configuration should work.
+    git reset --hard HEAD
+
+    popd > /dev/null
 }
 
 run()

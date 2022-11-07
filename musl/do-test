@@ -19,7 +19,14 @@ USE_LWIP=1
 
 setup_app()
 {
-    git clone https://github.com/dragosargint/test "$app"
+    if ! test -d "$app"; then
+        git clone https://github.com/dragosargint/test "$app"
+    fi
+
+    pushd "$app" > /dev/null
+
+    git reset --hard HEAD
+
     pushd "$top"/libs > /dev/null
     ln -sfn musl lib-musl
     popd > /dev/null
