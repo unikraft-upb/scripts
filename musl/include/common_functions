@@ -25,6 +25,7 @@ setup_unikraft()
     git checkout -b musl-support upb/musl-support
     git checkout -b statfs_to_statvfs-in-macro-guard upb/statfs_to_statvfs-in-macro-guard
     git checkout -b send-recv-guard upb/send-recv-guard
+    git checkout -b musl-lwip-compatible upb/musl-lwip-compatible
 
     # Integrate PRs 553 and 602.
     git remote add maniatro111 https://github.com/maniatro111/unikraft/
@@ -70,6 +71,7 @@ setup_unikraft()
     git cherry-pick fix_9pfs_rw
     git cherry-pick replace-access-call
     git cherry-pick update-legacy_syscall.h
+    git cherry-pick musl-lwip-compatible
 }
 
 setup_musl()
@@ -129,6 +131,7 @@ setup_musl()
     git cherry-pick enable_fpsimd
     git rebase dont_clean_includes
     git cherry-pick fix-posix-sysinfo
+    git cherry-pick makefile-lwip-integration~3
     git cherry-pick makefile-lwip-integration~2
     git cherry-pick makefile-lwip-integration~1
     git cherry-pick makefile-lwip-integration
@@ -156,6 +159,7 @@ setup_lwip()
     git checkout staging
     git rebase skuenzer/sched-refactor
     git rebase fix-__unused
+    git cherry-pick musl-support~2
     git cherry-pick musl-support~1
     git cherry-pick musl-support
 }
