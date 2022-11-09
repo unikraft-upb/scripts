@@ -69,6 +69,7 @@ setup_unikraft()
     git cherry-pick fix_open_call
     git cherry-pick fix_pipe_call
     git cherry-pick fix_9pfs_rw
+    git cherry-pick replace-access-call~1
     git cherry-pick replace-access-call
     git cherry-pick update-legacy_syscall.h
     git cherry-pick musl-lwip-compatible
@@ -113,8 +114,8 @@ setup_musl()
     git fetch upb
     git checkout -b makefile-lwip-integration upb/makefile-lwip-integration
     git checkout -b posix-user-sources upb/posix-user-sources
-    git checkout -b add_sysexits.h upb/add_sysexits.h
-    git checkout -b add_wait.c upb/add_wait.c
+    git checkout -b add-sysexits.h upb/add-sysexits.h
+    git checkout -b add-wait.c upb/add-wait.c
 
     # Rebase all branches
     git checkout -b musl-support staging
@@ -133,13 +134,12 @@ setup_musl()
     git cherry-pick enable_fpsimd
     git rebase dont_clean_includes
     git cherry-pick fix-posix-sysinfo
-    git cherry-pick makefile-lwip-integration~3
     git cherry-pick makefile-lwip-integration~2
     git cherry-pick makefile-lwip-integration~1
     git cherry-pick makefile-lwip-integration
     git cherry-pick posix-user-sources
-    git cherry-pick add_sysexits.h
-    git cherry-pick add_wait.c
+    git cherry-pick add-sysexits.h
+    git cherry-pick add-wait.c
 }
 
 setup_lwip()
