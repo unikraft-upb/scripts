@@ -379,6 +379,10 @@ setup()
     if test ! -d "$libs"/sqlite; then
         git clone https://github.com/unikraft/lib-sqlite "$libs"/sqlite
     fi
+
+    if test ! -d "$libs"/redis; then
+        git clone https://github.com/unikraft/lib-redis "$libs"/redis
+    fi
 }
 
 build()

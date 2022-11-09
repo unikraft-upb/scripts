@@ -123,7 +123,7 @@ HTTP request sent, awaiting response... 200 OK
 Length: unspecified [text/html]
 Saving to: ‘index.html’
 
-index.html                                        [ <=>                                                                                             ]     160  --.-KB/s    in 0s      
+index.html                                        [ <=>                                                                                             ]     160  --.-KB/s    in 0s
 
 2022-11-01 22:17:37 (33.9 MB/s) - ‘index.html’ saved [160]
 ```
@@ -198,7 +198,7 @@ test: libsodium_minimal_testsuite->uktest_test_aead_chacha20poly13052
     :   expected `uk_sodium_cmptest(&aead_chacha20poly13052)` to be 0 and was 0 ......... [ PASSED ]
 test: libsodium_minimal_testsuite->uktest_test_aead_xchacha20poly1305
     :   expected `uk_sodium_cmptest(&aead_xchacha20poly1305)` to be 0 and was 0 ......... [ PASSED ]
-test: libsodium_minimal_testsuite->uktest_test_auth                                                 
+test: libsodium_minimal_testsuite->uktest_test_auth
     :   expected `uk_sodium_cmptest(&auth)` to be 0 and was 0 ........................... [ PASSED ]
 [...]
 ```
@@ -241,4 +241,66 @@ oOo oOO| | | | |   (| | | (_) |  _) :_
 SQLite version 3.30.1 2019-10-10 20:19:45
 Enter ".help" for usage hints.
 sqlite>
+```
+
+## Redis
+
+Use the `do-httpreply` script to build and run [`app-redis`](https://github.com/unikraft/app-redis) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Follow the exact same steps as above, but replace `helloworld` with `redis` throughout commands to use.
+
+The `run` command creates a Redis server waiting for connections:
+
+```
+$ ./do-redis run_qemu
+
+[...]
+1: Set IPv4 address 172.44.0.2 mask 255.255.255.0 gw 172.44.0.1
+en1: Added
+en1: Interface is up
+Powered by
+o.   .o       _ _               __ _
+Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
+oOo oOO| | | | |   (| | | (_) |  _) :_
+ OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
+                 Phoebe 0.10.0~0bbbd142
+0:M 09 Nov 2022 16:25:01.022 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+0:M 09 Nov 2022 16:25:01.026 # Redis version=5.0.6, bits=64, commit=c5ee3442, modified=1, pid=0, just started
+0:M 09 Nov 2022 16:25:01.031 # Configuration loaded
+0:M 09 Nov 2022 16:25:01.096 # You requested maxclients of 10000 requiring at least 10032 max file descriptors.
+0:M 09 Nov 2022 16:25:01.102 # Server can't set maximum open files to 10032 because of OS error: No such file or directory.
+0:M 09 Nov 2022 16:25:01.110 # Current maximum open files is 1024. maxclients has been reduced to 992 to compensate for low ulimit. If you need higher maxclients increase 'ulimit -n'.
+0:M 09 Nov 2022 16:25:01.119 # Warning: can't mask SIGALRM in bio.c thread: No error information
+0:M 09 Nov 2022 16:25:01.126 # Warning: can't mask SIGALRM in bio.c thread: No error information
+0:M 09 Nov 2022 16:25:01.135 # Warning: can't mask SIGALRM in bio.c thread: No error information
+                _._
+           _.-``__ ''-._
+      _.-``    `.  `_.  ''-._           Redis 5.0.6 (c5ee3442/1) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._
+ (    '      ,       .-`  | `,    )     Running in standalone mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
+ |    `-._   `._    /     _.-'    |     PID: 0
+  `-._    `-._  `-./  _.-'    _.-'
+ |`-._`-._    `-.__.-'    _.-'_.-'|
+ |    `-._`-._        _.-'_.-'    |           http://redis.io
+  `-._    `-._`-.__.-'_.-'    _.-'
+ |`-._`-._    `-.__.-'    _.-'_.-'|
+ |    `-._`-._        _.-'_.-'    |
+  `-._    `-._`-.__.-'_.-'    _.-'
+      `-._    `-.__.-'    _.-'
+          `-._        _.-'
+              `-.__.-'
+
+0:M 09 Nov 2022 16:25:01.262 # Server initialized
+0:M 09 Nov 2022 16:25:01.267 * Ready to accept connections
+```
+
+The server waits for connection on IP address `172.44.0.2` on the default port (`6379`).
+Test it by running `redis-cli` in another console:
+
+```
+$ redis-cli -h 172.44.0.2
+172.44.0.2:6379> PING
+PONG
+172.44.0.2:6379>
 ```
