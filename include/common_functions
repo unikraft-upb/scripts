@@ -108,11 +108,13 @@ setup_musl()
     git fetch StefanJum
     git checkout -b fix-posix-sysinfo StefanJum/fix-posix-sysinfo
 
-    # Integrate PR #19, #20
+    # Integrate PR #19, #20, #22, #23
     git remote add upb https://github.com/unikraft-upb/lib-musl/
     git fetch upb
     git checkout -b makefile-lwip-integration upb/makefile-lwip-integration
     git checkout -b posix-user-sources upb/posix-user-sources
+    git checkout -b add_sysexits.h upb/add_sysexits.h
+    git checkout -b add_wait.c upb/add_wait.c
 
     # Rebase all branches
     git checkout -b musl-support staging
@@ -136,6 +138,8 @@ setup_musl()
     git cherry-pick makefile-lwip-integration~1
     git cherry-pick makefile-lwip-integration
     git cherry-pick posix-user-sources
+    git cherry-pick add_sysexits.h
+    git cherry-pick add_wait.c
 }
 
 setup_lwip()
@@ -150,10 +154,11 @@ setup_lwip()
     git fetch upb
     git checkout -b fix-__unused upb/fix-__unused
 
-    # Integrate PR #23: Add Musl support
+    # Integrate PR #23, #25: Add Musl support
     git remote add upb https://github.com/unikraft-upb/lib-lwip
     git fetch upb
     git checkout -b musl-support upb/musl-support
+    git checkout -b remove_ip6addr upb/remove_ip6addr
 
     # Rebase all branches
     git checkout staging
@@ -162,6 +167,7 @@ setup_lwip()
     git cherry-pick musl-support~2
     git cherry-pick musl-support~1
     git cherry-pick musl-support
+    git rebase remove_ip6addr
 }
 
 setup_libcxx()
@@ -241,6 +247,45 @@ setup_libsodium()
     git rebase add-posix-event
 }
 
+setup_zlib()
+{
+    # Integrate PR #4: Update version: 1.2.12 -> 1.2.13
+    git remote add Sabanic-P https://github.com/Sabanic-P/lib-zlib
+    git fetch Sabanic-P
+    git checkout -b changeto.13 Sabanic-P/changeto.13
+
+    git checkout staging
+    git rebase changeto.13
+}
+
+setup_libuuid()
+{
+    # Integrate PR #2: Add include/private to the list of include directories
+    git remote add upb https://github.com/unikraft-upb/lib-libuuid
+    git fetch upb
+    git checkout -b include-private upb/include-private
+
+    git checkout staging
+    git rebase include-private
+}
+
+setup_python3()
+{
+    # Integrate PR #5: Add patch to disable SOCK_CLOEXEC usage.
+    git remote add vladandrew https://github.com/vladandrew/lib-python3
+    git fetch vladandrew
+    git checkout -b vladb/sock_cloexec vladandrew/vladb/sock_cloexec
+
+    # Integrate PR #9: Use value 8 for SIZEOF_PTHREAD_T
+    git remote add upb https://github.com/unikraft-upb/lib-python3
+    git fetch upb
+    git checkout -b fix_sizeof_pthread_t upb/fix_sizeof_pthread_t
+
+    git checkout staging
+    git rebase vladb/sock_cloexec
+    git rebase fix_sizeof_pthread_t
+}
+
 setup()
 {
     mkdir -p "$top"
@@ -307,6 +352,27 @@ setup()
         git clone https://github.com/unikraft/lib-libsodium "$libs"/libsodium
         pushd "$libs"/libsodium > /dev/null
         setup_libsodium
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/zlib; then
+        git clone https://github.com/unikraft/lib-zlib "$libs"/zlib
+        pushd "$libs"/zlib > /dev/null
+        setup_zlib
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/libuuid; then
+        git clone https://github.com/unikraft/lib-libuuid "$libs"/libuuid
+        pushd "$libs"/libuuid > /dev/null
+        setup_libuuid
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/python3; then
+        git clone https://github.com/unikraft/lib-python3 "$libs"/python3
+        pushd "$libs"/python3 > /dev/null
+        setup_python3
         popd > /dev/null
     fi
 }

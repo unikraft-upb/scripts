@@ -202,3 +202,18 @@ test: libsodium_minimal_testsuite->uktest_test_auth
     :   expected `uk_sodium_cmptest(&auth)` to be 0 and was 0 ........................... [ PASSED ]
 [...]
 ```
+
+## Python3
+
+Use the `do-python3` script to build and run [`app-httpreply`](https://github.com/unikraft/app-python3) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Follow the exact same steps as above, but replace `helloworld` with `python3` throughout commands to use.
+
+The `run` command starts a Python shell:
+
+```
+$ ./do-python3 run
+
+[...]
+>>> 2**32
+4294967296
+```
