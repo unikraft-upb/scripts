@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# https://stackoverflow.com/a/246128/4804196
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    SOURCE=$(readlink "$SOURCE")
+    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPT_DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+source "$SCRIPT_DIR"/../include/base
+
+app="$top"/apps/app-sqlite
+
+source "$SCRIPT_DIR"/../include/common_functions
+
+setup_app()
+{
+    if ! test -d "$app"; then
+        git clone https://github.com/unikraft/app-sqlite "$app"
+    fi
+
+    pushd "$app" > /dev/null
+
+    git reset --hard HEAD
+
+    # Use updated kraft.yaml (including Musl dependency).
+    git remote add upb https://github.com/unikraft-upb/app-sqlite
+    git fetch upb
+    git checkout -b use-musl upb/use-musl
+
+    git checkout staging
+    git rebase use-musl
+
+    popd > /dev/null
+}
+
+run()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft run
+    popd > /dev/null
+}
+
+run_qemu()
+{
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -kernel build/sqlite_kvm-x86_64 \
+        -cpu host \
+        -enable-kvm \
+        -fsdev local,id=myid,path=$(pwd)/fs0,security_model=none \
+        -device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off \
+        -nographic
+    popd > /dev/null
+}
+
+source "$SCRIPT_DIR"/../include/common_command

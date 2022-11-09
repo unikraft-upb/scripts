@@ -375,6 +375,10 @@ setup()
         setup_python3
         popd > /dev/null
     fi
+
+    if test ! -d "$libs"/sqlite; then
+        git clone https://github.com/unikraft/lib-sqlite "$libs"/sqlite
+    fi
 }
 
 build()

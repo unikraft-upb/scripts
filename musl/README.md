@@ -217,3 +217,28 @@ $ ./do-python3 run
 >>> 2**32
 4294967296
 ```
+
+## SQLite
+
+Use the `do-sqlite` script to build and run [`app-httpreply`](https://github.com/unikraft/app-sqlite) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Follow the exact same steps as above, but replace `helloworld` with `sqlite` throughout commands to use.
+
+The `run` command starts a Python shell:
+
+```
+$ ./do-sqlite run
+
+[...]
+Booting from ROM...
+Powered by
+o.   .o       _ _               __ _
+Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
+oOo oOO| | | | |   (| | | (_) |  _) :_
+ OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
+                 Phoebe 0.10.0~cb60cdcd
+-- warning: cannot find home directory; cannot read ~/.sqliterc
+SQLite version 3.30.1 2019-10-10 20:19:45
+Enter ".help" for usage hints.
+sqlite>
+```
