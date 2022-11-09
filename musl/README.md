@@ -304,3 +304,27 @@ $ redis-cli -h 172.44.0.2
 PONG
 172.44.0.2:6379>
 ```
+
+## Nginx
+
+Use the `do-httpreply` script to build and run [`app-nginx`](https://github.com/unikraft/app-nginx) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Follow the exact same steps as above, but replace `helloworld` with `nginx` throughout commands to use.
+
+The `run` command aims to start an Nginx web server:
+
+```
+$ ./do-nginx run_qemu
+1: Set IPv4 address 172.44.0.2 mask 255.255.255.0 gw 172.44.0.1
+en1: Added
+en1: Interface is up
+Powered by
+o.   .o       _ _               __ _
+Oo   Oo  ___ (_) | __ __  __ _ ' _) :_
+oO   oO ' _ `| | |/ /  _)' _` | |_|  _)
+oOo oOO| | | | |   (| | | (_) |  _) :_
+ OoOoO ._, ._:_:_,\_._,  .__,_:_, \___)
+                 Phoebe 0.10.0~0bbbd142
+nginx: [emerg] sigaction(SIGHUP) failed (38: Unknown error)
+```
+
+Given the current lack of signal support, the command fails.

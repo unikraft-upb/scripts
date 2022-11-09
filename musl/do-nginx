@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# https://stackoverflow.com/a/246128/4804196
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    SOURCE=$(readlink "$SOURCE")
+    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPT_DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+source "$SCRIPT_DIR"/../include/base
+
+app="$top"/apps/app-nginx
+
+source "$SCRIPT_DIR"/../include/common_functions
+
+setup_app()
+{
+    if ! test -d "$app"; then
+        git clone https://github.com/unikraft/app-nginx "$app"
+    fi
+
+    pushd "$app" > /dev/null
+
+    git reset --hard HEAD
+
+    # Use updated kraft.yaml (including Musl dependency).
+    git remote add upb https://github.com/unikraft-upb/app-nginx
+    git fetch upb
+    git checkout -b use-musl upb/use-musl
+
+    git checkout staging
+    git rebase use-musl
+
+    popd > /dev/null
+}
+
+run()
+{
+    _setup_networking
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft run -b virbr0 "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --"
+    popd > /dev/null
+}
+
+run_qemu()
+{
+    _setup_networking
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -kernel "build/nginx_kvm-x86_64" \
+        -cpu host \
+        -enable-kvm \
+        -nographic \
+        -netdev bridge,id=en0,br=virbr0 \
+        -device virtio-net-pci,netdev=en0 \
+        -append "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --" \
+        -fsdev local,id=myid,path=$(pwd)/fs0,security_model=none \
+        -device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off
+    popd > /dev/null
+}
+
+source "$SCRIPT_DIR"/../include/common_command

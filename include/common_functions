@@ -286,6 +286,19 @@ setup_python3()
     git rebase fix_sizeof_pthread_t
 }
 
+setup_nginx()
+{
+    # Integrate PRs #9, #10
+    git remote add upb https://github.com/unikraft-upb/lib-nginx
+    git fetch upb
+    git checkout -b add-posix-lib-dependency upb/add-posix-lib-dependency
+    git checkout -b remove-werror upb/remove-werror
+
+    git checkout staging
+    git rebase add-posix-lib-dependency
+    git rebase remove-werror
+}
+
 setup()
 {
     mkdir -p "$top"
@@ -382,6 +395,13 @@ setup()
 
     if test ! -d "$libs"/redis; then
         git clone https://github.com/unikraft/lib-redis "$libs"/redis
+    fi
+
+    if test ! -d "$libs"/nginx; then
+        git clone https://github.com/unikraft/lib-nginx "$libs"/nginx
+        pushd "$libs"/nginx > /dev/null
+        setup_nginx
+        popd > /dev/null
     fi
 }
 
