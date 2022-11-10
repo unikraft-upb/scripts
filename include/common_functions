@@ -293,10 +293,12 @@ setup_nginx()
     git fetch upb
     git checkout -b add-posix-lib-dependency upb/add-posix-lib-dependency
     git checkout -b remove-werror upb/remove-werror
+    git checkout -b include-uk-config upb/include-uk-config
 
     git checkout staging
     git rebase add-posix-lib-dependency
     git rebase remove-werror
+    git rebase include-uk-config
 }
 
 setup()
