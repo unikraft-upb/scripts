@@ -117,6 +117,10 @@ setup_musl()
     git checkout -b add-sysexits.h upb/add-sysexits.h
     git checkout -b add-wait.c upb/add-wait.c
 
+    git remote add Fpostolache https://github.com/maniatro111/lib-musl.git
+    git fetch Fpostolache
+    git checkout -b include-tgmath-header-when-math-and-complex-libs-are-enabled Fpostolache/include-tgmath-header-when-math-and-complex-libs-are-enabled
+
     # Rebase all branches
     git checkout -b musl-support staging
     git rebase thread_support
@@ -140,6 +144,7 @@ setup_musl()
     git cherry-pick posix-user-sources
     git cherry-pick add-sysexits.h
     git cherry-pick add-wait.c
+    git cherry-pick include-tgmath-header-when-math-and-complex-libs-are-enabled
 }
 
 setup_lwip()
