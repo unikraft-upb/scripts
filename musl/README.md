@@ -220,7 +220,7 @@ $ ./do-python3 run
 
 ## SQLite
 
-Use the `do-sqlite` script to build and run [`app-httpreply`](https://github.com/unikraft/app-sqlite) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Use the `do-sqlite` script to build and run [`app-sqlite`](https://github.com/unikraft/app-sqlite) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
 Follow the exact same steps as above, but replace `helloworld` with `sqlite` throughout commands to use.
 
 The `run` command starts a Python shell:
