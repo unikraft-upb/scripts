@@ -205,7 +205,7 @@ test: libsodium_minimal_testsuite->uktest_test_auth
 
 ## Python3
 
-Use the `do-python3` script to build and run [`app-httpreply`](https://github.com/unikraft/app-python3) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Use the `do-python3` script to build and run [`app-python3`](https://github.com/unikraft/app-python3) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
 Follow the exact same steps as above, but replace `helloworld` with `python3` throughout commands to use.
 
 The `run` command starts a Python shell:
