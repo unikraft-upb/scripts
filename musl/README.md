@@ -245,7 +245,7 @@ sqlite>
 
 ## Redis
 
-Use the `do-httpreply` script to build and run [`app-redis`](https://github.com/unikraft/app-redis) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Use the `do-redis` script to build and run [`app-redis`](https://github.com/unikraft/app-redis) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
 Follow the exact same steps as above, but replace `helloworld` with `redis` throughout commands to use.
 
 The `run` command creates a Redis server waiting for connections:
