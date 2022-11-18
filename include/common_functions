@@ -5,14 +5,17 @@ need_x86_uktest=1
 setup_unikraft()
 {
     # Use Simon's scheduling branch.
-    #git remote add skuenzer https://github.com/skuenzer/unikraft
-    #git fetch skuenzer
-    #git checkout -b skuenzer/sched-refactor skuenzer/skuenzer/sched-refactor
+    git remote add skuenzer https://github.com/skuenzer/unikraft
+    git fetch skuenzer
+    git checkout -b skuenzer/libcontext skuenzer/skuenzer/libcontext
+    git checkout -b skuenzer/uksched-ng skuenzer/skuenzer/uksched-ng
+    git checkout -b skuenzer/syscallshim-clone skuenzer/skuenzer/syscallshim-clone
+    git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
 
     ## Integrate PR #454: lib/uktime: Solve redefining conflicts
-    #git remote add dragosargint https://github.com/dragosargint/unikraft
-    #git fetch dragosargint
-    #git checkout -b uktime dragosargint/uktime
+    git remote add dragosargint https://github.com/dragosargint/unikraft
+    git fetch dragosargint
+    git checkout -b uktime dragosargint/uktime
 
     ## Rebase the two branches.
     #git checkout -b musl-support staging
@@ -22,56 +25,59 @@ setup_unikraft()
     # Use a merging of Simon's and Dragos's changes.
     git remote add upb https://github.com/unikraft-upb/unikraft
     git fetch upb
-    git checkout -b musl-support upb/musl-support
-    git checkout -b statfs_to_statvfs-in-macro-guard upb/statfs_to_statvfs-in-macro-guard
-    git checkout -b send-recv-guard upb/send-recv-guard
+    #git checkout -b musl-support upb/musl-support
+    #git checkout -b send-recv-guard upb/send-recv-guard
     git checkout -b musl-lwip-compatible upb/musl-lwip-compatible
 
     # Integrate PRs 553 and 602.
     git remote add maniatro111 https://github.com/maniatro111/unikraft/
     git fetch maniatro111
     git checkout -b clone-rule maniatro111/clone-rule
-    git checkout -b disable-uktest-test-myself-suite-when-option-is-disabled maniatro111/disable-uktest-test-myself-suite-when-option-is-disabled
+    #git checkout -b disable-uktest-test-myself-suite-when-option-is-disabled maniatro111/disable-uktest-test-myself-suite-when-option-is-disabled
 
     # Integrate PR 551: Warning fix: uninitialized variable #551
-    git remote add mariamosn https://github.com/mariamosn/unikraft/
-    git fetch mariamosn
-    git checkout -b local2 mariamosn/local2
+    #git remote add mariamosn https://github.com/mariamosn/unikraft/
+    #git fetch mariamosn
+    #git checkout -b local2 mariamosn/local2
 
     # Integrate PRs 638, 639
     git remote add eduardvintila https://github.com/eduardvintila/unikraft/
     git fetch eduardvintila
-    git checkout -b fix_open_call eduardvintila/fix_open_call
-    git checkout -b fix_pipe_call eduardvintila/fix_pipe_call
+    #git checkout -b fix_open_call eduardvintila/fix_open_call
+    #git checkout -b fix_pipe_call eduardvintila/fix_pipe_call
     git checkout -b fix_9pfs_rw eduardvintila/fix_9pfs_rw
 
     # Integrate PRs 636
-    git remote add mariasfiraiala https://github.com/mariasfiraiala/unikraft
-    git fetch mariasfiraiala
-    git checkout -b replace-access-call mariasfiraiala/replace-access-call
-    git checkout -b update-legacy_syscall.h mariasfiraiala/update-legacy_syscall.h
+    #git remote add mariasfiraiala https://github.com/mariasfiraiala/unikraft
+    #git fetch mariasfiraiala
+    #git checkout -b replace-access-call mariasfiraiala/replace-access-call
+    #git checkout -b update-legacy_syscall.h mariasfiraiala/update-legacy_syscall.h
 
-    if test ! "$need_x86_uktest" -eq 1; then
-        # Integrate PR 606, fixing ARM runs.
-        git remote add alexhoppus https://github.com/alexhoppus/unikraft/
-        git fetch alexhoppus
-        git checkout -b bugfix/uktest_perm_ro alexhoppus/bugfix/uktest_perm_ro
-    fi
+    #if test ! "$need_x86_uktest" -eq 1; then
+    #    # Integrate PR 606, fixing ARM runs.
+    #    git remote add alexhoppus https://github.com/alexhoppus/unikraft/
+    #    git fetch alexhoppus
+    #    git checkout -b bugfix/uktest_perm_ro alexhoppus/bugfix/uktest_perm_ro
+    #fi
 
     git checkout staging
-    git rebase musl-support
-    git rebase statfs_to_statvfs-in-macro-guard
-    git rebase send-recv-guard
+    #git rebase musl-support
+    git rebase uktime
+    git rebase skuenzer/libcontext
+    git cherry-pick skuenzer/uksched-ng~32..skuenzer/uksched-ng
+    git cherry-pick skuenzer/syscallshim-clone~8..skuenzer/syscallshim-clone
+    git cherry-pick skuenzer/posixprocess-clone~36..skuenzer/posixprocess-clone
+    #git rebase send-recv-guard
     git rebase clone-rule
-    git cherry-pick disable-uktest-test-myself-suite-when-option-is-disabled
-    git cherry-pick bugfix/uktest_perm_ro
-    git cherry-pick local2
-    git cherry-pick fix_open_call
-    git cherry-pick fix_pipe_call
+    #git cherry-pick disable-uktest-test-myself-suite-when-option-is-disabled
+    #git cherry-pick bugfix/uktest_perm_ro
+    #git cherry-pick local2
+    #git cherry-pick fix_open_call
+    #git cherry-pick fix_pipe_call
     git cherry-pick fix_9pfs_rw
-    git cherry-pick replace-access-call~1
-    git cherry-pick replace-access-call
-    git cherry-pick update-legacy_syscall.h
+    #git cherry-pick replace-access-call~1
+    #git cherry-pick replace-access-call
+    #git cherry-pick update-legacy_syscall.h
     git cherry-pick musl-lwip-compatible
 }
 
@@ -114,8 +120,13 @@ setup_musl()
     git fetch upb
     git checkout -b makefile-lwip-integration upb/makefile-lwip-integration
     git checkout -b posix-user-sources upb/posix-user-sources
-    git checkout -b add-sysexits.h upb/add-sysexits.h
-    git checkout -b add-wait.c upb/add-wait.c
+    #git checkout -b add-sysexits.h upb/add-sysexits.h
+    #git checkout -b add-wait.c upb/add-wait.c
+
+    # Integrate PR #24: Include tgmath.h header
+    git remote add maniatro111 https://github.com/maniatro111/lib-musl/
+    git fetch maniatro111
+    git checkout -b include-tgmath-header-when-math-and-complex-libs-are-enabled maniatro111/include-tgmath-header-when-math-and-complex-libs-are-enabled
 
     # Rebase all branches
     git checkout -b musl-support staging
@@ -138,8 +149,9 @@ setup_musl()
     git cherry-pick makefile-lwip-integration~1
     git cherry-pick makefile-lwip-integration
     git cherry-pick posix-user-sources
-    git cherry-pick add-sysexits.h
-    git cherry-pick add-wait.c
+    #git cherry-pick add-sysexits.h
+    #git cherry-pick add-wait.c
+    git cherry-pick include-tgmath-header-when-math-and-complex-libs-are-enabled
 }
 
 setup_lwip()
@@ -150,79 +162,89 @@ setup_lwip()
     git checkout -b skuenzer/sched-refactor skuenzer/skuenzer/sched-refactor
 
     # Integrate PR #22: Add uk/essentials.h as include dependency
-    git remote add upb https://github.com/unikraft-upb/lib-lwip
-    git fetch upb
-    git checkout -b fix-__unused upb/fix-__unused
+    #git remote add upb https://github.com/unikraft-upb/lib-lwip
+    #git fetch upb
+    #git checkout -b fix-__unused upb/fix-__unused
 
     # Integrate PR #23, #25: Add Musl support
     git remote add upb https://github.com/unikraft-upb/lib-lwip
     git fetch upb
     git checkout -b musl-support upb/musl-support
-    git checkout -b remove_ip6addr upb/remove_ip6addr
+    #git checkout -b remove_ip6addr upb/remove_ip6addr
 
     # Rebase all branches
     git checkout staging
     git rebase skuenzer/sched-refactor
-    git rebase fix-__unused
+    #git rebase fix-__unused
     git cherry-pick musl-support~2
     git cherry-pick musl-support~1
     git cherry-pick musl-support
-    git rebase remove_ip6addr
+    #git rebase remove_ip6addr
 }
 
 setup_libcxx()
 {
+    :
     # Integrate PRs #9, #10, #14, #17, #18, #22.
-    git remote add upb https://github.com/unikraft-upb/lib-libcxx
-    git fetch upb
-    git checkout -b fix-features upb/fix-features
-    git checkout -b fix-xlocale upb/fix-xlocale
-    git checkout -b patch-locale upb/patch-locale
-    git checkout -b fix-glue upb/fix-glue
-    git checkout -b change-include-next upb/change-include-next
-    git checkout -b add-math-header upb/add-math-header
+    #git remote add upb https://github.com/unikraft-upb/lib-libcxx
+    #git fetch upb
+    #git checkout -b fix-features upb/fix-features
+    #git checkout -b fix-xlocale upb/fix-xlocale
+    #git checkout -b patch-locale upb/patch-locale
+    #git checkout -b fix-glue upb/fix-glue
+    #git checkout -b change-include-next upb/change-include-next
+    #git checkout -b add-math-header upb/add-math-header
+
+    # Integrate PR #23: Add patch with definition for vasprintf
+    #git remote add mariasfiraiala https://github.com/mariasfiraiala/lib-libcxx
+    #git fetch mariasfiraiala
+    #git checkout -b patch-support/musl mariasfiraiala/patch-support/musl
 
     # Rebase all branches.
-    git checkout staging
-    git rebase fix-features
-    git rebase fix-xlocale
-    git rebase patch-locale
-    git rebase fix-glue
-    git rebase change-include-next
-    git rebase add-math-header
+    #git checkout staging
+    #git rebase fix-features
+    #git rebase fix-xlocale
+    #git rebase patch-locale
+    #git rebase fix-glue
+    #git rebase change-include-next
+    #git rebase add-math-header
+    #git rebase patch-support/musl
 }
 
 setup_libcxxabi()
 {
+    :
     # Integrate PR #2: Config.uk: Fix dependencies with libunwind
-    git remote add upb https://github.com/unikraft-upb/lib-libcxxabi
-    git fetch upb
-    git checkout -b fix-libunwind-dep upb/fix-libunwind-dep
+    #git remote add upb https://github.com/unikraft-upb/lib-libcxxabi
+    #git fetch upb
+    #git checkout -b fix-libunwind-dep upb/fix-libunwind-dep
 
-    git checkout staging
-    git rebase fix-libunwind-dep
+    #git checkout staging
+    #git rebase fix-libunwind-dep
 }
 
 setup_libunwind()
 {
+    :
     # Integrate PR #3: Config.uk: Fix dependencies with libcxxabi
-    git remote add upb https://github.com/unikraft-upb/lib-libunwind
-    git fetch upb
-    git checkout -b fix-libcxxabi-dep upb/fix-libcxxabi-dep
+    #git remote add upb https://github.com/unikraft-upb/lib-libunwind
+    #git fetch upb
+    #git checkout -b fix-libcxxabi-dep upb/fix-libcxxabi-dep
 
-    git checkout staging
-    git rebase fix-libcxxabi-dep
+    #git checkout staging
+    #git rebase fix-libcxxabi-dep
 }
 
 setup_compiler_rt()
 {
+    :
     # Integrate PR #8: Circular dependencies if adding libunwind as dependency
-    git remote add DeliaPavel https://github.com/DeliaPavel/lib-compiler-rt
-    git fetch DeliaPavel
-    git checkout -b DeliaPavel-staging DeliaPavel/staging
+    #git remote add DeliaPavel https://github.com/DeliaPavel/lib-compiler-rt
+    #git fetch DeliaPavel
+    #git checkout -b DeliaPavel-staging DeliaPavel/staging
 
-    git checkout staging
-    git rebase DeliaPavel-staging
+    #git checkout staging
+    #git rebase DeliaPavel-staging
 }
 
 setup_libc_test()
@@ -238,24 +260,26 @@ setup_libc_test()
 
 setup_libsodium()
 {
+    :
     # Integrate PR #6: Add the internal 'posix-event' library as a dependency
-    git remote add hchandad https://github.com/hchandad/unikraft-libsodium-port/
-    git fetch hchandad
-    git checkout -b add-posix-event hchandad/add-posix-event
+    #git remote add hchandad https://github.com/hchandad/unikraft-libsodium-port/
+    #git fetch hchandad
+    #git checkout -b add-posix-event hchandad/add-posix-event
 
-    git checkout staging
-    git rebase add-posix-event
+    #git checkout staging
+    #git rebase add-posix-event
 }
 
 setup_zlib()
 {
+    :
     # Integrate PR #4: Update version: 1.2.12 -> 1.2.13
-    git remote add Sabanic-P https://github.com/Sabanic-P/lib-zlib
-    git fetch Sabanic-P
-    git checkout -b changeto.13 Sabanic-P/changeto.13
+    #git remote add Sabanic-P https://github.com/Sabanic-P/lib-zlib
+    #git fetch Sabanic-P
+    #git checkout -b changeto.13 Sabanic-P/changeto.13
 
-    git checkout staging
-    git rebase changeto.13
+    #git checkout staging
+    #git rebase changeto.13
 }
 
 setup_libuuid()
@@ -271,34 +295,36 @@ setup_libuuid()
 
 setup_python3()
 {
+    :
     # Integrate PR #5: Add patch to disable SOCK_CLOEXEC usage.
-    git remote add vladandrew https://github.com/vladandrew/lib-python3
-    git fetch vladandrew
-    git checkout -b vladb/sock_cloexec vladandrew/vladb/sock_cloexec
+    #git remote add vladandrew https://github.com/vladandrew/lib-python3
+    #git fetch vladandrew
+    #git checkout -b vladb/sock_cloexec vladandrew/vladb/sock_cloexec
 
-    # Integrate PR #9: Use value 8 for SIZEOF_PTHREAD_T
-    git remote add upb https://github.com/unikraft-upb/lib-python3
-    git fetch upb
-    git checkout -b fix_sizeof_pthread_t upb/fix_sizeof_pthread_t
+    ## Integrate PR #9: Use value 8 for SIZEOF_PTHREAD_T
+    #git remote add upb https://github.com/unikraft-upb/lib-python3
+    #git fetch upb
+    #git checkout -b fix_sizeof_pthread_t upb/fix_sizeof_pthread_t
 
-    git checkout staging
-    git rebase vladb/sock_cloexec
-    git rebase fix_sizeof_pthread_t
+    #git checkout staging
+    #git rebase vladb/sock_cloexec
+    #git rebase fix_sizeof_pthread_t
 }
 
 setup_nginx()
 {
+    :
     # Integrate PRs #9, #10
-    git remote add upb https://github.com/unikraft-upb/lib-nginx
-    git fetch upb
-    git checkout -b add-posix-lib-dependency upb/add-posix-lib-dependency
-    git checkout -b remove-werror upb/remove-werror
-    git checkout -b include-uk-config upb/include-uk-config
+    #git remote add upb https://github.com/unikraft-upb/lib-nginx
+    #git fetch upb
+    #git checkout -b add-posix-lib-dependency upb/add-posix-lib-dependency
+    #git checkout -b remove-werror upb/remove-werror
+    #git checkout -b include-uk-config upb/include-uk-config
 
-    git checkout staging
-    git rebase add-posix-lib-dependency
-    git rebase remove-werror
-    git rebase include-uk-config
+    #git checkout staging
+    #git rebase add-posix-lib-dependency
+    #git rebase remove-werror
+    #git rebase include-uk-config
 }
 
 setup()
