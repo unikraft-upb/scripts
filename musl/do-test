@@ -34,6 +34,10 @@ setup_app()
 
 build()
 {
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     cp CONFIG_TO_BE_COPIED .config
     make prepare
@@ -44,6 +48,10 @@ build()
 run()
 {
     #_setup_networking
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
         -kernel "build/test_kvm-x86_64" \

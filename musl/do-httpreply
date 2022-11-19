@@ -36,6 +36,10 @@ setup_app()
 run()
 {
     _setup_networking
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
     kraft run -b virbr0 "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --"
@@ -45,6 +49,10 @@ run()
 run_qemu()
 {
     _setup_networking
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
         -kernel "build/httpreply_kvm-x86_64" \

@@ -41,6 +41,10 @@ setup_app()
 
 run()
 {
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
     kraft run
@@ -49,6 +53,10 @@ run()
 
 run_qemu()
 {
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     #_setup_networking
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \

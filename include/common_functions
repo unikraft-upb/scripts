@@ -435,6 +435,10 @@ setup()
 
 build()
 {
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
     # Do not use LIBUKSIGNAL with Musl.
@@ -446,6 +450,10 @@ build()
 
 clean()
 {
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
     kraft clean -d
