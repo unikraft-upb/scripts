@@ -174,9 +174,7 @@ setup_lwip()
     git checkout staging
     git rebase skuenzer/sched-refactor
     #git rebase fix-__unused
-    git cherry-pick musl-support~2
-    git cherry-pick musl-support~1
-    git cherry-pick musl-support
+    git rebase musl-support
     #git rebase remove_ip6addr
 }
 
