@@ -145,9 +145,7 @@ setup_musl()
     git cherry-pick enable_fpsimd
     git rebase dont_clean_includes
     git cherry-pick fix-posix-sysinfo
-    git cherry-pick makefile-lwip-integration~2
-    git cherry-pick makefile-lwip-integration~1
-    git cherry-pick makefile-lwip-integration
+    git rebase makefile-lwip-integration
     git cherry-pick posix-user-sources
     #git cherry-pick add-sysexits.h
     #git cherry-pick add-wait.c
