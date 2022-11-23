@@ -41,11 +41,11 @@ setup_unikraft()
     #git checkout -b local2 mariamosn/local2
 
     # Integrate PRs 638, 639
-    git remote add eduardvintila https://github.com/eduardvintila/unikraft/
-    git fetch eduardvintila
+    #git remote add eduardvintila https://github.com/eduardvintila/unikraft/
+    #git fetch eduardvintila
     #git checkout -b fix_open_call eduardvintila/fix_open_call
     #git checkout -b fix_pipe_call eduardvintila/fix_pipe_call
-    git checkout -b fix_9pfs_rw eduardvintila/fix_9pfs_rw
+    #git checkout -b fix_9pfs_rw eduardvintila/fix_9pfs_rw
 
     # Integrate PRs 636
     #git remote add mariasfiraiala https://github.com/mariasfiraiala/unikraft
@@ -74,11 +74,11 @@ setup_unikraft()
     #git cherry-pick local2
     #git cherry-pick fix_open_call
     #git cherry-pick fix_pipe_call
-    git cherry-pick fix_9pfs_rw
+    #git cherry-pick fix_9pfs_rw
     #git cherry-pick replace-access-call~1
     #git cherry-pick replace-access-call
     #git cherry-pick update-legacy_syscall.h
-    git cherry-pick musl-lwip-compatible
+    git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
 }
 
 setup_musl()
