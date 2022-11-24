@@ -87,73 +87,77 @@ setup_unikraft()
 setup_musl()
 {
     # Integrate PR #9: Thread support for musl
-    git remote add dragosargint https://github.com/dragosargint/lib-musl/
-    git fetch dragosargint
-    git checkout -b thread_support dragosargint/thread_support
+    #git remote add dragosargint https://github.com/dragosargint/lib-musl/
+    #git fetch dragosargint
+    #git checkout -b thread_support dragosargint/thread_support
 
     # Integrate aarch64 PRs: #6, #7, #11, #13
-    git remote add kubanrob https://github.com/kubanrob/lib-musl/
-    git fetch kubanrob
-    git checkout -b add-patches-for-aarch64 kubanrob/add-patches-for-aarch64
-    git checkout -b update-aarch64-makefiles kubanrob/update-aarch64-makefiles
-    git checkout -b patch-CVE-2020-28928 kubanrob/patch-CVE-2020-28928
-    git checkout -b hide-internal-headers kubanrob/hide-internal-headers
+    #git remote add kubanrob https://github.com/kubanrob/lib-musl/
+    #git fetch kubanrob
+    #git checkout -b add-patches-for-aarch64 kubanrob/add-patches-for-aarch64
+    #git checkout -b update-aarch64-makefiles kubanrob/update-aarch64-makefiles
+    #git checkout -b patch-CVE-2020-28928 kubanrob/patch-CVE-2020-28928
+    #git checkout -b hide-internal-headers kubanrob/hide-internal-headers
 
     # Integrate build PRs: #15, #17
-    git checkout -b parallel-make kubanrob/parallel-make
+    #git checkout -b parallel-make kubanrob/parallel-make
     #git checkout -b dont_clean_includes kubanrob/dont_clean_includes
 
     # Integrate PR #14:  Enable FPSIMD support on ARM64
-    git remote add razvanvirtan https://github.com/razvanvirtan/lib-musl/
-    git fetch razvanvirtan
-    git checkout -b enable_fpsimd razvanvirtan/enable_fpsimd
+    #git remote add razvanvirtan https://github.com/razvanvirtan/lib-musl/
+    #git fetch razvanvirtan
+    #git checkout -b enable_fpsimd razvanvirtan/enable_fpsimd
 
     # Integrate PR #12: Add syscall wrapper for getrandom
-    git remote add michpappas https://github.com/michpappas/lib-musl/
-    git fetch michpappas
-    git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
+    #git remote add michpappas https://github.com/michpappas/lib-musl/
+    #git fetch michpappas
+    #git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
 
-    # Integrate PRs #18: Always include the uname sources
-    git remote add StefanJum https://github.com/StefanJum/lib-musl/
-    git fetch StefanJum
-    git checkout -b fix-posix-sysinfo StefanJum/fix-posix-sysinfo
-
-    # Integrate PR #19, #20
     git remote add upb https://github.com/unikraft-upb/lib-musl/
     git fetch upb
-    git checkout -b makefile-lwip-integration upb/makefile-lwip-integration
-    git checkout -b posix-user-sources upb/posix-user-sources
+    git checkout -b add_syscall_wrapper_for_getrandom upb/add_syscall_wrapper_for_getrandom
+
+    # Integrate PRs #18: Always include the uname sources
+    #git remote add StefanJum https://github.com/StefanJum/lib-musl/
+    #git fetch StefanJum
+    #git checkout -b fix-posix-sysinfo StefanJum/fix-posix-sysinfo
+
+    # Integrate PR #19, #20
+    #git remote add upb https://github.com/unikraft-upb/lib-musl/
+    #git fetch upb
+    #git checkout -b makefile-lwip-integration upb/makefile-lwip-integration
+    #git checkout -b posix-user-sources upb/posix-user-sources
     #git checkout -b add-sysexits.h upb/add-sysexits.h
     #git checkout -b add-wait.c upb/add-wait.c
 
     # Integrate PR #24: Include tgmath.h header
-    git remote add maniatro111 https://github.com/maniatro111/lib-musl/
-    git fetch maniatro111
-    git checkout -b include-tgmath-header-when-math-and-complex-libs-are-enabled maniatro111/include-tgmath-header-when-math-and-complex-libs-are-enabled
+    #git remote add maniatro111 https://github.com/maniatro111/lib-musl/
+    #git fetch maniatro111
+    #git checkout -b include-tgmath-header-when-math-and-complex-libs-are-enabled maniatro111/include-tgmath-header-when-math-and-complex-libs-are-enabled
 
     # Rebase all branches
     git checkout -b musl-support origin/staging
-    git rebase thread_support
-    git cherry-pick add-patches-for-aarch64~3
-    git cherry-pick add-patches-for-aarch64~2
-    git cherry-pick add-patches-for-aarch64~1
-    git cherry-pick add-patches-for-aarch64
-    git cherry-pick update-aarch64-makefiles~2
-    git cherry-pick update-aarch64-makefiles~1
-    git cherry-pick update-aarch64-makefiles
-    git cherry-pick patch-CVE-2020-28928
+    #git rebase thread_support
+    #git cherry-pick add-patches-for-aarch64~3
+    #git cherry-pick add-patches-for-aarch64~2
+    #git cherry-pick add-patches-for-aarch64~1
+    #git cherry-pick add-patches-for-aarch64
+    #git cherry-pick update-aarch64-makefiles~2
+    #git cherry-pick update-aarch64-makefiles~1
+    #git cherry-pick update-aarch64-makefiles
+    #git cherry-pick patch-CVE-2020-28928
     git cherry-pick add_syscall_wrapper_for_getrandom
-    git cherry-pick hide-internal-headers
-    git cherry-pick parallel-make
-    git cherry-pick enable_fpsimd
+    #git cherry-pick hide-internal-headers
+    #git cherry-pick parallel-make
+    #git cherry-pick enable_fpsimd
     #git rebase dont_clean_includes
-    git cherry-pick fix-posix-sysinfo
-    git cherry-pick makefile-lwip-integration
-    git cherry-pick makefile-lwip-integration~1
-    git cherry-pick posix-user-sources
+    #git cherry-pick fix-posix-sysinfo
+    #git cherry-pick makefile-lwip-integration
+    #git cherry-pick makefile-lwip-integration~1
+    #git cherry-pick posix-user-sources
     #git cherry-pick add-sysexits.h
     #git cherry-pick add-wait.c
-    git cherry-pick include-tgmath-header-when-math-and-complex-libs-are-enabled
+    #git cherry-pick include-tgmath-header-when-math-and-complex-libs-are-enabled
 }
 
 setup_lwip()
