@@ -11,7 +11,7 @@ setup_unikraft()
     #git checkout -b skuenzer/uksched-ng skuenzer/skuenzer/uksched-ng
     git checkout -b skuenzer/syscallshim-clone skuenzer/skuenzer/syscallshim-clone
     git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
-    git checkout -b skuenzer/vfscore-warncast skuenzer/skuenzer/vfscore-warncast
+    #git checkout -b skuenzer/vfscore-warncast skuenzer/skuenzer/vfscore-warncast
 
     ## Integrate PR #454: lib/uktime: Solve redefining conflicts
     #git remote add dragosargint https://github.com/dragosargint/unikraft
@@ -66,8 +66,8 @@ setup_unikraft()
     #git rebase uktime
     #git rebase skuenzer/libcontext
     #git cherry-pick skuenzer/uksched-ng~32..skuenzer/uksched-ng
-    ##git rebase skuenzer/syscallshim-clone
-    ##git cherry-pick skuenzer/posixprocess-clone~36..skuenzer/posixprocess-clone
+    git rebase skuenzer/syscallshim-clone
+    git cherry-pick skuenzer/posixprocess-clone~18..skuenzer/posixprocess-clone
     #git rebase send-recv-guard
     ##git cherry-pick clone-rule~2..clone-rule
     #git cherry-pick disable-uktest-test-myself-suite-when-option-is-disabled
@@ -79,9 +79,9 @@ setup_unikraft()
     #git cherry-pick replace-access-call~1
     #git cherry-pick replace-access-call
     #git cherry-pick update-legacy_syscall.h
-    ##git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
-    git rebase musl-lwip-compatible
-    git cherry-pick skuenzer/vfscore-warncast
+    git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
+    #git rebase musl-lwip-compatible
+    #git cherry-pick skuenzer/vfscore-warncast
 }
 
 setup_musl()
