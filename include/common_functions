@@ -11,6 +11,7 @@ setup_unikraft()
     #git checkout -b skuenzer/uksched-ng skuenzer/skuenzer/uksched-ng
     git checkout -b skuenzer/syscallshim-clone skuenzer/skuenzer/syscallshim-clone
     git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
+    git checkout -b skuenzer/vfscore-warncast skuenzer/skuenzer/vfscore-warncast
 
     ## Integrate PR #454: lib/uktime: Solve redefining conflicts
     #git remote add dragosargint https://github.com/dragosargint/unikraft
@@ -80,6 +81,7 @@ setup_unikraft()
     #git cherry-pick update-legacy_syscall.h
     ##git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
     git rebase musl-lwip-compatible
+    git cherry-pick skuenzer/vfscore-warncast
 }
 
 setup_musl()
