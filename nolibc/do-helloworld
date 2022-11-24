@@ -15,7 +15,7 @@ app="$top"/apps/app-helloworld
 
 source "$SCRIPT_DIR"/../include/common_functions
 
-USE_LWIP=0
+USE_LWIP=1
 
 setup_app()
 {
