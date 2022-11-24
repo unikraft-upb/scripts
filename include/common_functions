@@ -65,10 +65,10 @@ setup_unikraft()
     #git rebase uktime
     #git rebase skuenzer/libcontext
     #git cherry-pick skuenzer/uksched-ng~32..skuenzer/uksched-ng
-    git rebase skuenzer/syscallshim-clone
-    git cherry-pick skuenzer/posixprocess-clone~36..skuenzer/posixprocess-clone
+    ##git rebase skuenzer/syscallshim-clone
+    ##git cherry-pick skuenzer/posixprocess-clone~36..skuenzer/posixprocess-clone
     #git rebase send-recv-guard
-    git cherry-pick clone-rule~2..clone-rule
+    ##git cherry-pick clone-rule~2..clone-rule
     #git cherry-pick disable-uktest-test-myself-suite-when-option-is-disabled
     #git cherry-pick bugfix/uktest_perm_ro
     #git cherry-pick local2
@@ -78,7 +78,8 @@ setup_unikraft()
     #git cherry-pick replace-access-call~1
     #git cherry-pick replace-access-call
     #git cherry-pick update-legacy_syscall.h
-    git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
+    ##git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
+    git rebase musl-lwip-compatible
 }
 
 setup_musl()
