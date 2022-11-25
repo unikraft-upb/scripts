@@ -12,6 +12,7 @@ setup_unikraft()
     git checkout -b skuenzer/syscallshim-clone skuenzer/skuenzer/syscallshim-clone
     git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
     #git checkout -b skuenzer/vfscore-warncast skuenzer/skuenzer/vfscore-warncast
+    git checkout -b skuenzer/checkpatchconfig skuenzer/skuenzer/checkpatchconfig
 
     ## Integrate PR #454: lib/uktime: Solve redefining conflicts
     #git remote add dragosargint https://github.com/dragosargint/unikraft
@@ -29,6 +30,7 @@ setup_unikraft()
     #git checkout -b musl-support upb/musl-support
     #git checkout -b send-recv-guard upb/send-recv-guard
     git checkout -b musl-lwip-compatible upb/musl-lwip-compatible
+    git checkout -b posix-socket-fix-warnings upb/posix-socket-fix-warnings
 
     # Integrate PRs 553 and 602.
     git remote add maniatro111 https://github.com/maniatro111/unikraft/
@@ -41,9 +43,11 @@ setup_unikraft()
     #git fetch mariamosn
     #git checkout -b local2 mariamosn/local2
 
-    # Integrate PRs 638, 639
-    #git remote add eduardvintila https://github.com/eduardvintila/unikraft/
-    #git fetch eduardvintila
+    # Integrate PRs 638, 639, 660, 661
+    git remote add eduardvintila https://github.com/eduardvintila/unikraft/
+    git fetch eduardvintila
+    git checkout -b fix_uktcb_typo2 eduardvintila/fix_uktcb_typo2
+    git checkout -b fix_lxstat_warning eduardvintila/fix_lxstat_warning
     #git checkout -b fix_open_call eduardvintila/fix_open_call
     #git checkout -b fix_pipe_call eduardvintila/fix_pipe_call
     #git checkout -b fix_9pfs_rw eduardvintila/fix_9pfs_rw
@@ -67,7 +71,7 @@ setup_unikraft()
     #git rebase skuenzer/libcontext
     #git cherry-pick skuenzer/uksched-ng~32..skuenzer/uksched-ng
     git rebase skuenzer/syscallshim-clone
-    git cherry-pick skuenzer/posixprocess-clone~18..skuenzer/posixprocess-clone
+    git cherry-pick skuenzer/posixprocess-clone~20..skuenzer/posixprocess-clone
     #git rebase send-recv-guard
     ##git cherry-pick clone-rule~2..clone-rule
     #git cherry-pick disable-uktest-test-myself-suite-when-option-is-disabled
@@ -82,6 +86,10 @@ setup_unikraft()
     git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
     #git rebase musl-lwip-compatible
     #git cherry-pick skuenzer/vfscore-warncast
+    git cherry-pick fix_uktcb_typo2
+    git cherry-pick fix_lxstat_warning
+    git cherry-pick skuenzer/checkpatchconfig~2..skuenzer/checkpatchconfig~2
+    git cherry-pick posix-socket-fix-warnings
 }
 
 setup_musl()
@@ -109,9 +117,9 @@ setup_musl()
     #git checkout -b enable_fpsimd razvanvirtan/enable_fpsimd
 
     # Integrate PR #12: Add syscall wrapper for getrandom
-    git remote add michpappas https://github.com/michpappas/lib-musl/
-    git fetch michpappas
-    git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
+    #git remote add michpappas https://github.com/michpappas/lib-musl/
+    #git fetch michpappas
+    #git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
 
     #git remote add upb https://github.com/unikraft-upb/lib-musl/
     #git fetch upb
@@ -135,8 +143,15 @@ setup_musl()
     #git fetch maniatro111
     #git checkout -b include-tgmath-header-when-math-and-complex-libs-are-enabled maniatro111/include-tgmath-header-when-math-and-complex-libs-are-enabled
 
+    # Integrate PR #26:
+    git remote add eduardvintila https://github.com/eduardvintila/lib-musl/
+    git fetch eduardvintila
+    git checkout -b fix_uktcb_typo eduardvintila/fix_uktcb_typo
+
     # Rebase all branches
     git checkout -b musl-support origin/staging
+    git cherry-pick fix_uktcb_typo
+
     #git rebase thread_support
     #git cherry-pick add-patches-for-aarch64~3
     #git cherry-pick add-patches-for-aarch64~2
@@ -146,7 +161,7 @@ setup_musl()
     #git cherry-pick update-aarch64-makefiles~1
     #git cherry-pick update-aarch64-makefiles
     #git cherry-pick patch-CVE-2020-28928
-    git cherry-pick add_syscall_wrapper_for_getrandom
+    #git cherry-pick add_syscall_wrapper_for_getrandom
     #git cherry-pick hide-internal-headers
     #git cherry-pick parallel-make
     #git cherry-pick enable_fpsimd
@@ -162,6 +177,7 @@ setup_musl()
 
 setup_lwip()
 {
+    :
     # Integrate PR #19: Adopt to refactored scheduling API (lib/uksched)
     #git remote add skuenzer https://github.com/skuenzer/lib-lwip
     #git fetch skuenzer
@@ -173,16 +189,16 @@ setup_lwip()
     #git checkout -b fix-__unused upb/fix-__unused
 
     # Integrate PR #23, #25: Add Musl support
-    git remote add upb https://github.com/unikraft-upb/lib-lwip
-    git fetch upb
-    git checkout -b musl-support upb/musl-support
+    #git remote add upb https://github.com/unikraft-upb/lib-lwip
+    #git fetch upb
+    #git checkout -b musl-support upb/musl-support
     #git checkout -b remove_ip6addr upb/remove_ip6addr
 
     # Rebase all branches
-    git checkout -b unified-musl-support origin/staging
+    #git checkout -b unified-musl-support origin/staging
     #git rebase skuenzer/sched-refactor
     ##git rebase fix-__unused
-    git cherry-pick musl-support~4..musl-support
+    #git cherry-pick musl-support~4..musl-support
     #git rebase remove_ip6addr
 }
 
@@ -205,7 +221,8 @@ setup_libcxx()
     #git checkout -b patch-support/musl mariasfiraiala/patch-support/musl
 
     # Rebase all branches.
-    #git checkout staging
+    #git checkout -b musl-support staging
+    #git cherry-pick patch-support/musl
     #git rebase fix-features
     #git rebase fix-xlocale
     #git rebase patch-locale
