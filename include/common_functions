@@ -109,13 +109,13 @@ setup_musl()
     #git checkout -b enable_fpsimd razvanvirtan/enable_fpsimd
 
     # Integrate PR #12: Add syscall wrapper for getrandom
-    #git remote add michpappas https://github.com/michpappas/lib-musl/
-    #git fetch michpappas
-    #git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
+    git remote add michpappas https://github.com/michpappas/lib-musl/
+    git fetch michpappas
+    git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
 
-    git remote add upb https://github.com/unikraft-upb/lib-musl/
-    git fetch upb
-    git checkout -b add_syscall_wrapper_for_getrandom upb/add_syscall_wrapper_for_getrandom
+    #git remote add upb https://github.com/unikraft-upb/lib-musl/
+    #git fetch upb
+    #git checkout -b add_syscall_wrapper_for_getrandom upb/add_syscall_wrapper_for_getrandom
 
     # Integrate PRs #18: Always include the uname sources
     #git remote add StefanJum https://github.com/StefanJum/lib-musl/
