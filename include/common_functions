@@ -5,12 +5,12 @@ need_x86_uktest=1
 setup_unikraft()
 {
     # Use Simon's scheduling branch.
-    git remote add skuenzer https://github.com/skuenzer/unikraft
-    git fetch skuenzer
+    #git remote add skuenzer https://github.com/skuenzer/unikraft
+    #git fetch skuenzer
     #git checkout -b skuenzer/libcontext skuenzer/skuenzer/libcontext
     #git checkout -b skuenzer/uksched-ng skuenzer/skuenzer/uksched-ng
     #git checkout -b skuenzer/syscallshim-clone skuenzer/skuenzer/syscallshim-clone
-    git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
+    #git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
     #git checkout -b skuenzer/vfscore-warncast skuenzer/skuenzer/vfscore-warncast
     #git checkout -b skuenzer/checkpatchconfig skuenzer/skuenzer/checkpatchconfig
 
@@ -30,7 +30,8 @@ setup_unikraft()
     #git checkout -b musl-support upb/musl-support
     #git checkout -b send-recv-guard upb/send-recv-guard
     git checkout -b musl-lwip-compatible upb/musl-lwip-compatible
-    git checkout -b fix-wait-waitpid-with-musl upb/fix-wait-waitpid-with-musl
+    git checkout -b stub-uksignal upb/stub-uksignal
+    #git checkout -b fix-wait-waitpid-with-musl upb/fix-wait-waitpid-with-musl
     #git checkout -b posix-socket-fix-warnings upb/posix-socket-fix-warnings
 
     # Integrate PRs 553 and 602.
@@ -72,7 +73,7 @@ setup_unikraft()
     #git rebase skuenzer/libcontext
     #git cherry-pick skuenzer/uksched-ng~32..skuenzer/uksched-ng
     #git rebase skuenzer/syscallshim-clone
-    git rebase skuenzer/posixprocess-clone
+    #git rebase skuenzer/posixprocess-clone
     #git cherry-pick skuenzer/posixprocess-clone~20..skuenzer/posixprocess-clone
     #git rebase send-recv-guard
     #git cherry-pick clone-rule~2..clone-rule
@@ -86,7 +87,8 @@ setup_unikraft()
     #git cherry-pick replace-access-call
     #git cherry-pick update-legacy_syscall.h
     git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
-    git cherry-pick fix-wait-waitpid-with-musl
+    git cherry-pick stub-uksignal~2..stub-uksignal
+    #git cherry-pick fix-wait-waitpid-with-musl
     #git rebase musl-lwip-compatible
     #git cherry-pick skuenzer/vfscore-warncast
     #git cherry-pick fix_uktcb_typo2
@@ -100,9 +102,9 @@ setup_musl()
     :
     # Integrate PR #9: Thread support for musl
     # Integrate PR #29: Avoid bug in uk_syscall_set_tid_address()
-    git remote add dragosargint https://github.com/dragosargint/lib-musl/
-    git fetch dragosargint
-    git checkout -b bug_fix dragosargint/bug_fix
+    #git remote add dragosargint https://github.com/dragosargint/lib-musl/
+    #git fetch dragosargint
+    #git checkout -b bug_fix dragosargint/bug_fix
     #git checkout -b thread_support dragosargint/thread_support
 
     # Integrate aarch64 PRs: #6, #7, #11, #13
@@ -127,8 +129,11 @@ setup_musl()
     #git fetch michpappas
     #git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
 
-    #git remote add upb https://github.com/unikraft-upb/lib-musl/
-    #git fetch upb
+    # Integrate PR #30: Add patch to fix definition of environ variable
+    git remote add upb https://github.com/unikraft-upb/lib-musl/
+    git fetch upb
+    #git checkout -b patch-environ upb/patch-environ
+    git checkout -b define-getdents64 upb/define-getdents64
     #git checkout -b add_syscall_wrapper_for_getrandom upb/add_syscall_wrapper_for_getrandom
 
     # Integrate PRs #18: Always include the uname sources
@@ -155,7 +160,9 @@ setup_musl()
     #git checkout -b fix_uktcb_typo eduardvintila/fix_uktcb_typo
 
     # Rebase all branches
-    #git checkout -b musl-support origin/staging
+    git checkout -b musl-support origin/staging
+    #git cherry-pick patch-environ
+    git cherry-pick define-getdents64
     #git cherry-pick fix_uktcb_typo
 
     #git rebase thread_support
@@ -191,10 +198,10 @@ setup_lwip()
 
     # Integrate PR #22: Add uk/essentials.h as include dependency
     # Integrate PR #27: patches: Include fcntl.h and sys/ioctl.h in sockets.c
-    git remote add upb https://github.com/unikraft-upb/lib-lwip
-    git fetch upb
+    #git remote add upb https://github.com/unikraft-upb/lib-lwip
+    #git fetch upb
     #git checkout -b fix-__unused upb/fix-__unused
-    git checkout -b patch-sockets-includes upb/patch-sockets-includes
+    #git checkout -b patch-sockets-includes upb/patch-sockets-includes
 
     # Integrate PR #23, #25: Add Musl support
     #git remote add upb https://github.com/unikraft-upb/lib-lwip
@@ -315,12 +322,12 @@ setup_libuuid()
 {
     :
     # Integrate PR #2: Add include/private to the list of include directories
-    git remote add upb https://github.com/unikraft-upb/lib-libuuid
-    git fetch upb
-    git checkout -b include-private upb/include-private
+    #git remote add upb https://github.com/unikraft-upb/lib-libuuid
+    #git fetch upb
+    #git checkout -b include-private upb/include-private
 
-    git checkout staging
-    git rebase include-private
+    #git checkout staging
+    #git rebase include-private
 }
 
 setup_python3()
@@ -496,7 +503,7 @@ build()
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
     # Do not use LIBUKSIGNAL with Musl.
-    kraft configure -n LIBUKSIGNAL -F -m x86_64 -p kvm
+    kraft configure -F -m x86_64 -p kvm
     kraft prepare
     kraft build -j $(nproc)
     popd > /dev/null

@@ -15,15 +15,11 @@ app="$top"/apps/app-micropython
 
 source "$SCRIPT_DIR"/../include/common_functions
 
-USE_LWIP=1
-
 setup_app()
 {
     if ! test -d "$app"; then
         git clone https://github.com/unikraft/app-micropython "$app"
     fi
-
-    pushd "$app" > /dev/null
 }
 
 run()
@@ -36,14 +32,34 @@ run()
 
 run_qemu()
 {
-    #_setup_networking
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
-        -initrd "helloworld.py" \
-        -kernel "build/micropython_kvm-x86_64" \
+        -initrd helloworld.py \
+        -kernel build/micropython_kvm-x86_64 \
         -cpu host \
         -enable-kvm \
         -nographic
+    popd > /dev/null
+}
+
+run_debug()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -initrd helloworld.py \
+        -kernel build/micropython_kvm-x86_64.dbg \
+        -cpu host \
+        -enable-kvm \
+        -nographic \
+        -gdb tcp::1234 -S
     popd > /dev/null
 }
 

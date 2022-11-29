@@ -44,13 +44,33 @@ run_qemu()
     fi
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
-        -kernel "build/httpreply_kvm-x86_64" \
+        -kernel build/httpreply_kvm-x86_64 \
         -cpu host \
         -enable-kvm \
         -nographic \
         -netdev bridge,id=en0,br=virbr0 \
         -device virtio-net-pci,netdev=en0 \
         -append "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --"
+    popd > /dev/null
+}
+
+run_debug()
+{
+    _setup_networking
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -kernel build/httpreply_kvm-x86_64.dbg \
+        -cpu host \
+        -enable-kvm \
+        -nographic \
+        -netdev bridge,id=en0,br=virbr0 \
+        -device virtio-net-pci,netdev=en0 \
+        -append "netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --" \
+        -gdb tcp::1234 -S
     popd > /dev/null
 }
 

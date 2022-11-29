@@ -47,6 +47,22 @@ build()
 
 run()
 {
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    #_setup_networking
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -kernel build/test_kvm-x86_64 \
+        -cpu host \
+        -enable-kvm \
+        -nographic
+    popd > /dev/null
+}
+
+run_debug()
+{
     #_setup_networking
     if test ! -d "$app"; then
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
@@ -54,10 +70,11 @@ run()
     fi
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
-        -kernel "build/test_kvm-x86_64" \
+        -kernel build/test_kvm-x86_64.dbg \
         -cpu host \
         -enable-kvm \
-        -nographic
+        -nographic \
+        -gdb tcp::1234 -S
     popd > /dev/null
 }
 

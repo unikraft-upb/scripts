@@ -65,4 +65,22 @@ run_qemu()
     popd > /dev/null
 }
 
+run_debug()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    sudo qemu-system-x86_64 \
+        -kernel build/sqlite_kvm-x86_64.dbg \
+        -cpu host \
+        -enable-kvm \
+        -fsdev local,id=myid,path=$(pwd)/fs0,security_model=none \
+        -device virtio-9p-pci,fsdev=myid,mount_tag=fs0,disable-modern=on,disable-legacy=off \
+        -nographic \
+        -gdb tcp::1234 -S
+    popd > /dev/null
+}
+
 source "$SCRIPT_DIR"/../include/common_command

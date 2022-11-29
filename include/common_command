@@ -31,6 +31,10 @@ case "$command" in
         run_qemu
         ;;
 
+    "run_debug")
+        run_debug
+        ;;
+
     "remove")
         remove
         ;;
