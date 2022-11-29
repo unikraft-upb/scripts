@@ -30,6 +30,7 @@ setup_unikraft()
     #git checkout -b musl-support upb/musl-support
     #git checkout -b send-recv-guard upb/send-recv-guard
     git checkout -b musl-lwip-compatible upb/musl-lwip-compatible
+    git checkout -b fix-wait-waitpid-with-musl upb/fix-wait-waitpid-with-musl
     #git checkout -b posix-socket-fix-warnings upb/posix-socket-fix-warnings
 
     # Integrate PRs 553 and 602.
@@ -70,7 +71,8 @@ setup_unikraft()
     #git rebase uktime
     #git rebase skuenzer/libcontext
     #git cherry-pick skuenzer/uksched-ng~32..skuenzer/uksched-ng
-    git rebase skuenzer/syscallshim-clone
+    #git rebase skuenzer/syscallshim-clone
+    git rebase skuenzer/posixprocess-clone
     #git cherry-pick skuenzer/posixprocess-clone~20..skuenzer/posixprocess-clone
     #git rebase send-recv-guard
     #git cherry-pick clone-rule~2..clone-rule
@@ -84,6 +86,7 @@ setup_unikraft()
     #git cherry-pick replace-access-call
     #git cherry-pick update-legacy_syscall.h
     git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
+    git cherry-pick fix-wait-waitpid-with-musl
     #git rebase musl-lwip-compatible
     #git cherry-pick skuenzer/vfscore-warncast
     #git cherry-pick fix_uktcb_typo2
