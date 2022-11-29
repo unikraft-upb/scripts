@@ -20,28 +20,6 @@ setup_app()
     if ! test -d "$app"; then
         git clone https://github.com/unikraft/app-redis "$app"
     fi
-
-    pushd "$app" > /dev/null
-
-    git reset --hard HEAD
-
-    # Integrate PR #6: Fix command for manually running redis
-    git remote add mariasfiraiala https://github.com/mariasfiraiala/app-redis
-    git fetch mariasfiraiala
-    git checkout -b fix-manually-run-command mariasfiraiala/fix-manually-run-command
-
-    # Use updated kraft.yaml (including Musl dependency).
-    git remote add upb https://github.com/unikraft-upb/app-redis
-    git fetch upb
-    git checkout -b use-9pfs upb/use-9pfs
-    git checkout -b use-musl upb/use-musl
-
-    git checkout staging
-    git rebase fix-manually-run-command
-    git rebase use-9pfs
-    git rebase use-musl
-
-    popd > /dev/null
 }
 
 run()

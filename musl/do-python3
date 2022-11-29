@@ -20,17 +20,6 @@ setup_app()
     if ! test -d "$app"; then
         git clone https://github.com/unikraft/app-python3 "$app"
     fi
-
-    pushd "$app" > /dev/null
-
-    git reset --hard HEAD
-
-    # Use updated kraft.yaml (including Musl dependency).
-    git remote add upb https://github.com/unikraft-upb/app-python3
-    git fetch upb
-    git checkout -b use-musl upb/use-musl
-
-    popd > /dev/null
 }
 
 run()

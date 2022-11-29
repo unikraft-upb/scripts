@@ -19,16 +19,11 @@ USE_LWIP=1
 
 setup_app()
 {
-    git clone https://github.com/unikraft/app-micropython "$app"
+    if ! test -d "$app"; then
+        git clone https://github.com/unikraft/app-micropython "$app"
+    fi
 
     pushd "$app" > /dev/null
-
-    # Use updated kraft.yaml (including Musl dependency).
-    git remote add upb https://github.com/unikraft-upb/app-micropython
-    git fetch upb
-    git checkout -b use-musl upb/use-musl
-
-    popd > /dev/null
 }
 
 run()

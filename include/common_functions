@@ -70,8 +70,8 @@ setup_unikraft()
     #git rebase uktime
     #git rebase skuenzer/libcontext
     #git cherry-pick skuenzer/uksched-ng~32..skuenzer/uksched-ng
-    #git rebase skuenzer/syscallshim-clone
-    git cherry-pick skuenzer/posixprocess-clone~20..skuenzer/posixprocess-clone
+    git rebase skuenzer/syscallshim-clone
+    #git cherry-pick skuenzer/posixprocess-clone~20..skuenzer/posixprocess-clone
     #git rebase send-recv-guard
     #git cherry-pick clone-rule~2..clone-rule
     #git cherry-pick disable-uktest-test-myself-suite-when-option-is-disabled
@@ -96,8 +96,10 @@ setup_musl()
 {
     :
     # Integrate PR #9: Thread support for musl
-    #git remote add dragosargint https://github.com/dragosargint/lib-musl/
-    #git fetch dragosargint
+    # Integrate PR #29: Avoid bug in uk_syscall_set_tid_address()
+    git remote add dragosargint https://github.com/dragosargint/lib-musl/
+    git fetch dragosargint
+    git checkout -b bug_fix dragosargint/bug_fix
     #git checkout -b thread_support dragosargint/thread_support
 
     # Integrate aarch64 PRs: #6, #7, #11, #13
@@ -352,6 +354,23 @@ setup_nginx()
     #git rebase include-uk-config
 }
 
+setup_micropython()
+{
+    :
+    # Integrate PRs #6
+    git remote add upb https://github.com/unikraft-upb/lib-micropython
+    git fetch upb
+    git checkout -b use-musl upb/use-musl
+    #git checkout -b remove-werror upb/remove-werror
+    #git checkout -b include-uk-config upb/include-uk-config
+
+    git checkout staging
+    git rebase use-musl
+    #git rebase add-posix-lib-dependency
+    #git rebase remove-werror
+    #git rebase include-uk-config
+}
+
 setup()
 {
     mkdir -p "$top"
@@ -459,6 +478,9 @@ setup()
 
     if test ! -d "$libs"/micropython; then
         git clone https://github.com/unikraft/lib-micropython "$libs"/micropython
+        pushd "$libs"/micropython > /dev/null
+        setup_micropython
+        popd > /dev/null
     fi
 }
 

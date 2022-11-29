@@ -20,20 +20,6 @@ setup_app()
     if ! test -d "$app"; then
         git clone https://github.com/unikraft/app-nginx "$app"
     fi
-
-    pushd "$app" > /dev/null
-
-    git reset --hard HEAD
-
-    # Use updated kraft.yaml (including Musl dependency).
-    git remote add upb https://github.com/unikraft-upb/app-nginx
-    git fetch upb
-    git checkout -b use-musl upb/use-musl
-
-    git checkout staging
-    git rebase use-musl
-
-    popd > /dev/null
 }
 
 run()
