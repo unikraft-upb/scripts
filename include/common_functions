@@ -1,18 +1,29 @@
 #!/bin/bash
 
-need_x86_uktest=1
+#need_x86_uktest=1
 
 setup_unikraft()
 {
     # Use Simon's scheduling branch.
-    #git remote add skuenzer https://github.com/skuenzer/unikraft
-    #git fetch skuenzer
+    git remote add skuenzer https://github.com/skuenzer/unikraft
+    git fetch skuenzer
     #git checkout -b skuenzer/libcontext skuenzer/skuenzer/libcontext
     #git checkout -b skuenzer/uksched-ng skuenzer/skuenzer/uksched-ng
     #git checkout -b skuenzer/syscallshim-clone skuenzer/skuenzer/syscallshim-clone
     #git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
     #git checkout -b skuenzer/vfscore-warncast skuenzer/skuenzer/vfscore-warncast
     #git checkout -b skuenzer/checkpatchconfig skuenzer/skuenzer/checkpatchconfig
+    git checkout -b skuenzer/uksched-inittabtypo skuenzer/skuenzer/uksched-inittabtypo
+
+    # Use Alex's PR.
+    git remote add nderjung https://github.com/nderjung/unikraft
+    git fetch nderjung
+    git checkout -b nderjung/make-param-n nderjung/nderjung/make-param-n
+
+    # Use Adina's PR
+    git remote add adinasm https://github.com/adinasm/unikraft
+    git fetch adinasm
+    git checkout -b posixprocess-tests adinasm/posixprocess-tests
 
     ## Integrate PR #454: lib/uktime: Solve redefining conflicts
     #git remote add dragosargint https://github.com/dragosargint/unikraft
@@ -25,12 +36,12 @@ setup_unikraft()
     #git rebase skuenzer/sched-refactor
 
     # Use a merging of Simon's and Dragos's changes.
-    git remote add upb https://github.com/unikraft-upb/unikraft
-    git fetch upb
+    #git remote add upb https://github.com/unikraft-upb/unikraft
+    #git fetch upb
     #git checkout -b musl-support upb/musl-support
     #git checkout -b send-recv-guard upb/send-recv-guard
-    git checkout -b musl-lwip-compatible upb/musl-lwip-compatible
-    git checkout -b stub-uksignal upb/stub-uksignal
+    #git checkout -b musl-lwip-compatible upb/musl-lwip-compatible
+    #git checkout -b stub-uksignal upb/stub-uksignal
     #git checkout -b fix-wait-waitpid-with-musl upb/fix-wait-waitpid-with-musl
     #git checkout -b posix-socket-fix-warnings upb/posix-socket-fix-warnings
 
@@ -68,6 +79,9 @@ setup_unikraft()
     #fi
 
     git checkout -b musl-support origin/staging
+    git cherry-pick skuenzer/uksched-inittabtypo~3..skuenzer/uksched-inittabtypo
+    git cherry-pick nderjung/make-param-n
+    git cherry-pick posixprocess-tests
     ### git rebase musl-support
     #git rebase uktime
     #git rebase skuenzer/libcontext
@@ -86,8 +100,8 @@ setup_unikraft()
     #git cherry-pick replace-access-call~1
     #git cherry-pick replace-access-call
     #git cherry-pick update-legacy_syscall.h
-    git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
-    git cherry-pick stub-uksignal~2..stub-uksignal
+    #git cherry-pick musl-lwip-compatible~5..musl-lwip-compatible
+    #git cherry-pick stub-uksignal~2..stub-uksignal
     #git cherry-pick fix-wait-waitpid-with-musl
     #git rebase musl-lwip-compatible
     #git cherry-pick skuenzer/vfscore-warncast
@@ -130,10 +144,10 @@ setup_musl()
     #git checkout -b add_syscall_wrapper_for_getrandom michpappas/add_syscall_wrapper_for_getrandom
 
     # Integrate PR #30: Add patch to fix definition of environ variable
-    git remote add upb https://github.com/unikraft-upb/lib-musl/
-    git fetch upb
+    #git remote add upb https://github.com/unikraft-upb/lib-musl/
+    #git fetch upb
     #git checkout -b patch-environ upb/patch-environ
-    git checkout -b define-getdents64 upb/define-getdents64
+    #git checkout -b define-getdents64 upb/define-getdents64
     #git checkout -b add_syscall_wrapper_for_getrandom upb/add_syscall_wrapper_for_getrandom
 
     # Integrate PRs #18: Always include the uname sources
@@ -160,9 +174,9 @@ setup_musl()
     #git checkout -b fix_uktcb_typo eduardvintila/fix_uktcb_typo
 
     # Rebase all branches
-    git checkout -b musl-support origin/staging
+    #git checkout -b musl-support origin/staging
     #git cherry-pick patch-environ
-    git cherry-pick define-getdents64
+    #git cherry-pick define-getdents64
     #git cherry-pick fix_uktcb_typo
 
     #git rebase thread_support
@@ -285,13 +299,14 @@ setup_compiler_rt()
 
 setup_libc_test()
 {
+    :
     # Integrate PR #1:  Introduce liblibctest for Unikraft
-    git remote add maniatro111 https://github.com/maniatro111/lib-libctest
-    git fetch maniatro111
-    git checkout -b maniatro111-staging maniatro111/staging
+    #git remote add maniatro111 https://github.com/maniatro111/lib-libctest
+    #git fetch maniatro111
+    #git checkout -b maniatro111-staging maniatro111/staging
 
-    git checkout staging
-    git rebase maniatro111-staging
+    #git checkout staging
+    #git rebase maniatro111-staging
 }
 
 setup_libsodium()
@@ -368,14 +383,14 @@ setup_micropython()
 {
     :
     # Integrate PRs #6
-    git remote add upb https://github.com/unikraft-upb/lib-micropython
-    git fetch upb
-    git checkout -b use-musl upb/use-musl
+    #git remote add upb https://github.com/unikraft-upb/lib-micropython
+    #git fetch upb
+    #git checkout -b use-musl upb/use-musl
     #git checkout -b remove-werror upb/remove-werror
     #git checkout -b include-uk-config upb/include-uk-config
 
-    git checkout staging
-    git rebase use-musl
+    #git checkout staging
+    #git rebase use-musl
     #git rebase add-posix-lib-dependency
     #git rebase remove-werror
     #git rebase include-uk-config
