@@ -381,6 +381,30 @@ setup_micropython()
     #git rebase include-uk-config
 }
 
+setup_gcc()
+{
+    :
+    # Integrate PRs TODO
+    #git remote add upb https://github.com/unikraft-upb/lib-gcc
+    #git fetch upb
+    #git checkout -b TODO upb / TODO
+
+    #git checkout -b musl-support origin/staging
+    #git rebase TODO
+}
+
+setup_libgo()
+{
+    :
+    # Integrate PRs TODO
+    #git remote add upb https://github.com/unikraft-upb/lib-libgo
+    #git fetch upb
+    #git checkout -b TODO upb / TODO
+
+    #git checkout -b musl-support origin/staging
+    #git rebase TODO
+}
+
 setup()
 {
     mkdir -p "$top"
@@ -490,6 +514,20 @@ setup()
         git clone https://github.com/unikraft/lib-micropython "$libs"/micropython
         pushd "$libs"/micropython > /dev/null
         setup_micropython
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/gcc; then
+        git clone https://github.com/unikraft/lib-gcc "$libs"/gcc
+        pushd "$libs"/gcc > /dev/null
+        setup_gcc
+        popd > /dev/null
+    fi
+
+    if test ! -d "$libs"/libgo; then
+        git clone https://github.com/unikraft/lib-libgo "$libs"/libgo
+        pushd "$libs"/libgo > /dev/null
+        setup_libgo
         popd > /dev/null
     fi
 }
