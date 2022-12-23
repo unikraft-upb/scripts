@@ -1,0 +1,115 @@
+#!/bin/bash
+
+# https://stackoverflow.com/a/246128/4804196
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    SOURCE=$(readlink "$SOURCE")
+    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPT_DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+source "$SCRIPT_DIR"/../include/base
+
+app="$top"/apps/app-helloworld
+
+source "$SCRIPT_DIR"/../include/common_functions
+
+setup()
+{
+    mkdir -p "$top"
+    mkdir -p "$libs"
+    mkdir -p "$apps"
+
+    if test ! -d "$uk"; then
+        git clone https://github.com/unikraft/unikraft "$uk"
+    fi
+}
+
+setup_app()
+{
+    if ! test -d "$app"; then
+        git clone https://github.com/unikraft/app-helloworld "$app"
+    fi
+
+    pushd "$app" > /dev/null
+
+    git reset --hard HEAD
+
+    # Use updated kraft.yaml (including Musl dependency).
+    git remote add upb https://github.com/unikraft-upb/app-helloworld
+    git fetch upb
+    git checkout -b static-lib upb/static-lib
+
+    popd > /dev/null
+}
+
+build()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft configure -F -m x86_64 -p linuxu
+    kraft prepare
+    kraft build -j $(nproc)
+
+    make -f Makefile.linuxu.static
+    popd > /dev/null
+}
+
+clean()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft clean -d
+    make -f Makefile.linuxu.static clean
+    git reset --hard HEAD
+    popd > /dev/null
+}
+
+run()
+{
+    pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    ./helloworld_static_linuxu
+    popd > /dev/null
+}
+
+if test $# -ne 1; then
+    echo "Usage: $0 <command>" 1>&2
+    echo "  command: setup build clean run" 1>&2
+    exit 1
+fi
+
+command="$1"
+
+case "$command" in
+
+    "setup")
+        setup
+        setup_app
+        ;;
+
+    "build")
+        build
+        ;;
+
+    "clean")
+        clean
+        ;;
+
+    "run")
+        run
+        ;;
+
+    *)
+        echo "Unknown command"
+        exit 1
+esac
