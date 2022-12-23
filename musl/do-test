@@ -20,15 +20,19 @@ USE_LWIP=1
 setup_app()
 {
     if ! test -d "$app"; then
-        git clone https://github.com/dragosargint/test "$app"
+        git clone https://github.com/unikraft/app-helloworld "$app"
     fi
 
     pushd "$app" > /dev/null
-    git reset --hard HEAD
-    popd > /dev/null
 
-    pushd "$top"/libs > /dev/null
-    ln -sfn musl lib-musl
+    git reset --hard HEAD
+
+    # Use updated kraft.yaml (including Musl dependency).
+    git remote add upb https://github.com/unikraft-upb/app-helloworld
+    git fetch upb
+    git checkout -b enable-all-tests upb/enable-all-tests
+    git checkout enable-all-tests
+
     popd > /dev/null
 }
 
@@ -39,10 +43,10 @@ build()
         exit 1
     fi
     pushd "$app" > /dev/null
-    cp CONFIG_TO_BE_COPIED .config
-    make prepare
-    make -j $(nproc)
+    export UK_WORKDIR=$(pwd)/../../
+    kraft run
     popd > /dev/null
+    pushd "$app" > /dev/null
 }
 
 run()
@@ -53,8 +57,21 @@ run()
     fi
     #_setup_networking
     pushd "$app" > /dev/null
+    export UK_WORKDIR=$(pwd)/../../
+    kraft run
+    popd > /dev/null
+}
+
+run_qemu()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    #_setup_networking
+    pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
-        -kernel build/test_kvm-x86_64 \
+        -kernel build/helloworld_kvm-x86_64 \
         -cpu host \
         -enable-kvm \
         -nographic
@@ -63,14 +80,14 @@ run()
 
 run_debug()
 {
-    #_setup_networking
     if test ! -d "$app"; then
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
         exit 1
     fi
+    #_setup_networking
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
-        -kernel build/test_kvm-x86_64.dbg \
+        -kernel build/helloworld_kvm-x86_64.dbg \
         -cpu host \
         -enable-kvm \
         -nographic \

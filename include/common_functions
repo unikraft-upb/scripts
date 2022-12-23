@@ -4,26 +4,27 @@
 
 setup_unikraft()
 {
+    :
     # Use Simon's scheduling branch.
-    git remote add skuenzer https://github.com/skuenzer/unikraft
-    git fetch skuenzer
+    #git remote add skuenzer https://github.com/skuenzer/unikraft
+    #git fetch skuenzer
     #git checkout -b skuenzer/libcontext skuenzer/skuenzer/libcontext
     #git checkout -b skuenzer/uksched-ng skuenzer/skuenzer/uksched-ng
     #git checkout -b skuenzer/syscallshim-clone skuenzer/skuenzer/syscallshim-clone
     #git checkout -b skuenzer/posixprocess-clone skuenzer/skuenzer/posixprocess-clone
     #git checkout -b skuenzer/vfscore-warncast skuenzer/skuenzer/vfscore-warncast
     #git checkout -b skuenzer/checkpatchconfig skuenzer/skuenzer/checkpatchconfig
-    git checkout -b skuenzer/uksched-inittabtypo skuenzer/skuenzer/uksched-inittabtypo
+    #git checkout -b skuenzer/uksched-inittabtypo skuenzer/skuenzer/uksched-inittabtypo
 
     # Use Alex's PR.
-    git remote add nderjung https://github.com/nderjung/unikraft
-    git fetch nderjung
-    git checkout -b nderjung/make-param-n nderjung/nderjung/make-param-n
+    #git remote add nderjung https://github.com/nderjung/unikraft
+    #git fetch nderjung
+    #git checkout -b nderjung/make-param-n nderjung/nderjung/make-param-n
 
     # Use Adina's PR
-    git remote add adinasm https://github.com/adinasm/unikraft
-    git fetch adinasm
-    git checkout -b posixprocess-tests adinasm/posixprocess-tests
+    #git remote add adinasm https://github.com/adinasm/unikraft
+    #git fetch adinasm
+    #git checkout -b posixprocess-tests adinasm/posixprocess-tests
 
     ## Integrate PR #454: lib/uktime: Solve redefining conflicts
     #git remote add dragosargint https://github.com/dragosargint/unikraft
@@ -78,10 +79,10 @@ setup_unikraft()
     #    git checkout -b bugfix/uktest_perm_ro alexhoppus/bugfix/uktest_perm_ro
     #fi
 
-    git checkout -b musl-support origin/staging
-    git cherry-pick skuenzer/uksched-inittabtypo~3..skuenzer/uksched-inittabtypo
-    git cherry-pick nderjung/make-param-n
-    git cherry-pick posixprocess-tests
+    #git checkout -b musl-support origin/staging
+    #git cherry-pick skuenzer/uksched-inittabtypo~3..skuenzer/uksched-inittabtypo
+    #git cherry-pick nderjung/make-param-n
+    #git cherry-pick posixprocess-tests
     ### git rebase musl-support
     #git rebase uktime
     #git rebase skuenzer/libcontext
