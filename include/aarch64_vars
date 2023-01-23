@@ -1,0 +1,5 @@
+# Download GCC cross compiler.
+# https://developer.arm.com/downloads/-/arm-gnu-toolchain-downloads
+# Full link: https://developer.arm.com/-/media/Files/downloads/gnu/11.2-2022.02/binrel/gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu.tar.xz
+AARCH64_GCC_BASE=~/packages/gcc-arm-11.2-2022.02-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-
+AARCH64_QEMU=/usr/bin/qemu-system-aarch64
