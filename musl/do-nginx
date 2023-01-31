@@ -20,11 +20,6 @@ setup_app()
     if ! test -d "$app"; then
         git clone https://github.com/unikraft/app-nginx "$app"
     fi
-    pushd "$app" > /dev/null
-    git remote add upb https://github.com/unikraft-upb/app-nginx
-    git fetch upb
-    git checkout -b add-uksignal-dependency upb/add-uksignal-dependency
-    popd > /dev/null
 }
 
 run()
