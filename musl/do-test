@@ -55,7 +55,6 @@ run()
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
         exit 1
     fi
-    #_setup_networking
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
     kraft run
@@ -68,7 +67,6 @@ run_qemu()
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
         exit 1
     fi
-    #_setup_networking
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
         -kernel build/helloworld_kvm-x86_64 \
@@ -84,7 +82,6 @@ run_debug()
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
         exit 1
     fi
-    #_setup_networking
     pushd "$app" > /dev/null
     sudo qemu-system-x86_64 \
         -kernel build/helloworld_kvm-x86_64.dbg \
