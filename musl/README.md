@@ -332,7 +332,7 @@ PONG
 
 ## Nginx
 
-Use the `do-httpreply` script to build and run [`app-nginx`](https://github.com/unikraft/app-nginx) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
+Use the `do-nginx` script to build and run [`app-nginx`](https://github.com/unikraft/app-nginx) with Unikraft and [Musl](https://github.com/unikraft/lib-musl) as its libc.
 Follow the exact same steps as above, but replace `helloworld` with `nginx` throughout commands to use.
 
 The `run` command aims to start an Nginx web server:
