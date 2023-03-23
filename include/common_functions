@@ -218,6 +218,9 @@ build()
     git checkout -- kraft.yaml
     kraft configure -F -m x86_64 -p kvm
     git checkout -- kraft.yaml
+    if test ! -f .config; then
+        kraft configure -m x86_64 -p kvm
+    fi
     kraft prepare
     git checkout -- kraft.yaml
     kraft build -j $(nproc)
