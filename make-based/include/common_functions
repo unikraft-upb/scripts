@@ -1,0 +1,167 @@
+#!/bin/bash
+
+setup_unikraft()
+{
+    :
+}
+
+setup_musl()
+{
+    :
+}
+
+setup_lwip()
+{
+    :
+}
+
+setup_libcxx()
+{
+    :
+}
+
+setup_libcxxabi()
+{
+    :
+}
+
+setup_libunwind()
+{
+    :
+}
+
+setup_compiler_rt()
+{
+    :
+}
+
+setup_libc_test()
+{
+    :
+}
+
+setup_libsodium()
+{
+    :
+}
+
+setup_zlib()
+{
+    :
+}
+
+setup_libuuid()
+{
+    :
+}
+
+setup_python3()
+{
+    :
+}
+
+setup_nginx()
+{
+    :
+}
+
+setup_micropython()
+{
+    :
+}
+
+setup_gcc()
+{
+    :
+}
+
+setup_libgo()
+{
+    :
+}
+
+setup_base()
+{
+    mkdir -p "$top"
+    mkdir -p "$libs"
+    mkdir -p "$apps"
+
+    if test ! -d "$uk"; then
+        git clone https://github.com/unikraft/unikraft "$uk"
+        pushd "$uk" > /dev/null
+        setup_unikraft
+        popd > /dev/null
+    fi
+}
+
+install_lib()
+{
+    l="$1"
+    if test ! -d "$libs"/"$l"; then
+        git clone https://github.com/unikraft/lib-"$l" "$libs"/"$l"
+        pushd "$libs"/"$l" > /dev/null
+        if test $(type -t setup_"$l") == "function"; then
+            setup_"$l"
+        fi
+        popd > /dev/null
+    fi
+}
+
+all_libs="musl lwip libcxx libcxxabi libunwind compiler-rt libc-test libsodium zlib libuuid python3 sqlite redis nginx micropython gcc libgo"
+
+setup_all_libs()
+{
+    for l in $all_libs; do
+        install_lib "$l"
+    done
+}
+
+configure()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+
+    pushd "$app" > /dev/null
+    make menuconfig
+    popd > /dev/null
+}
+
+build()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+
+    pushd "$app" > /dev/null
+    make -j $(nproc)
+    popd > /dev/null
+}
+
+clean()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    make properclean
+    git reset --hard HEAD
+    popd > /dev/null
+}
+
+remove()
+{
+    rm -fr "$top"
+}
+
+_setup_networking()
+{
+    sudo ip link set dev virbr0 down
+    sudo ip link del dev virbr0
+    sudo ip link add virbr0 type bridge
+    sudo ip address add 172.44.0.1/24 dev virbr0
+    sudo ip link set dev virbr0 up
+}

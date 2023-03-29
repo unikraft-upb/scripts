@@ -1,0 +1,45 @@
+#!/bin/bash
+
+if test $# -ne 1; then
+    echo "Usage: $0 <command>" 1>&2
+    echo "  command: setup configure build clean run run_debug remove" 1>&2
+    exit 1
+fi
+
+command="$1"
+
+case "$command" in
+
+    "setup")
+        setup_base
+        setup_app
+        ;;
+
+    "configure")
+        configure
+        ;;
+
+    "build")
+        build
+        ;;
+
+    "clean")
+        clean
+        ;;
+
+    "run")
+        run
+        ;;
+
+    "run_debug")
+        run_debug
+        ;;
+
+    "remove")
+        remove
+        ;;
+
+    *)
+        echo "Unknown command"
+        exit 1
+esac

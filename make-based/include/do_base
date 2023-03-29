@@ -1,0 +1,91 @@
+#!/bin/bash
+
+# https://stackoverflow.com/a/246128/4804196
+SOURCE=${BASH_SOURCE[0]}
+while [ -L "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+    DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+    SOURCE=$(readlink "$SOURCE")
+    [[ $SOURCE != /* ]] && SOURCE=$DIR/$SOURCE # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+SCRIPT_DIR=$( cd -P "$( dirname "$SOURCE" )" >/dev/null 2>&1 && pwd )
+
+source "$SCRIPT_DIR"/../include/base
+
+app="$top"/apps/app-"$app_basename"
+
+source "$SCRIPT_DIR"/../include/common_functions
+
+setup_app()
+{
+    if ! test -d "$app"; then
+        git clone https://github.com/unikraft/app-"$app_basename" "$app"
+    fi
+
+    pushd "$app" > /dev/null
+    git reset --hard HEAD
+    popd > /dev/null
+
+    # Copy configuration and build files to app folder.
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/* "$app" 2> /dev/null
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config "$app" 2> /dev/null
+
+    if test ! -z "$app_libs"; then
+        for l in $app_libs; do
+            install_lib "$l"
+        done
+    fi
+}
+
+kvm_image=build/"$app_basename"_kvm-x86_64
+
+arguments="-m 2G -nographic -nodefaults "
+arguments+="-display none -serial stdio -device isa-debug-exit "
+arguments+="-kernel $kvm_image "
+
+if test ! -z "$use_9p_rootfs"; then
+    if test "$use_9p_rootfs" -eq 1; then
+        arguments+="-fsdev local,security_model=passthrough,id=hvirtio0,path=$rootfs_9p "
+        arguments+="-device virtio-9p-pci,fsdev=hvirtio0,mount_tag=fs0 "
+    fi
+fi
+
+if test ! -z "$use_kvm"; then
+    if test "$use_kvm" -eq 1; then
+        arguments+="-enable-kvm -cpu host "
+    fi
+else
+    arguments+="-enable-kvm -cpu host "
+fi
+
+if test ! -z "$use_networking"; then
+    if test "$use_networking" -eq 1; then
+        _setup_networking
+        arguments+="-netdev bridge,id=en0,br=virbr0 "
+        arguments+="-device virtio-net-pci,netdev=en0 "
+        arguments+="-append \"netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 --\" "
+    fi
+fi
+
+run()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    eval sudo qemu-system-x86_64 "$arguments"
+    popd > /dev/null
+}
+
+run_debug()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    pushd "$app" > /dev/null
+    eval sudo qemu-system-x86_64 "$arguments" -gdb tcp::1234 -S
+    popd > /dev/null
+}
+
+source "$SCRIPT_DIR"/../include/common_command
