@@ -140,6 +140,29 @@ build()
     popd > /dev/null
 }
 
+DOCKER_REPOSITORY=index.unikraft.io/unikraft.org/hackathons/base:latest
+
+docker_build()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+
+    echo "$top"
+    ls $(pwd)/"$top"
+    cat > "$top"/build.sh <<END
+#!/bin/bash
+
+pushd /workdir/apps/app-"$app_basename" > /dev/null
+make -j $(nproc)
+popd > /dev/null
+END
+    chmod a+x "$top"/build.sh
+    docker run --rm -it -v $(pwd)/"$top":/workdir "$DOCKER_REPOSITORY" /bin/bash /workdir/build.sh
+    rm "$top"/build.sh
+}
+
 clean()
 {
     if test ! -d "$app"; then
@@ -150,6 +173,25 @@ clean()
     make properclean
     git reset --hard HEAD
     popd > /dev/null
+}
+
+docker_clean()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+
+    cat > "$top"/clean.sh <<END
+#!/bin/bash
+
+pushd /workdir/apps/app-"$app_basename" > /dev/null
+make properclean
+popd > /dev/null
+END
+    chmod a+x "$top"/clean.sh
+    docker run --rm -it -v $(pwd)/"$top":/workdir "$DOCKER_REPOSITORY" /bin/bash /workdir/clean.sh
+    rm "$top"/clean.sh
 }
 
 remove()
