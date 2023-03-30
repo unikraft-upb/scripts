@@ -3,7 +3,7 @@
 usage()
 {
     echo "Usage: $0 <command>" 1>&2
-    echo "  command: setup configure build clean run run_debug remove" 1>&2
+    echo "  command: setup configure build docker_build clean docker_clean run run_debug remove" 1>&2
 }
 
 if test $# -ne 1; then
@@ -28,8 +28,16 @@ case "$command" in
         build
         ;;
 
+    "docker_build")
+        docker_build
+        ;;
+
     "clean")
         clean
+        ;;
+
+    "docker_clean")
+        docker_clean
         ;;
 
     "run")
