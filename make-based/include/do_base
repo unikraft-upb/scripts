@@ -49,7 +49,7 @@ arguments+="-kernel $kvm_image "
 if test ! -z "$use_9p_rootfs"; then
     if test "$use_9p_rootfs" -eq 1; then
         arguments+="-fsdev local,security_model=passthrough,id=hvirtio0,path=$rootfs_9p "
-        arguments+="-device virtio-9p-pci,fsdev=hvirtio0,mount_tag=fs0 "
+        arguments+="-device virtio-9p-pci,fsdev=hvirtio0,mount_tag=fs0,disable-modern=on,disable-legacy=off "
     fi
 fi
 
