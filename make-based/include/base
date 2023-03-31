@@ -1,5 +1,5 @@
 #!/bin/bash
-
+nproc=2
 top=../../workdir
 libs="$top"/libs
 apps="$top"/apps

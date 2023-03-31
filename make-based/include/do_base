@@ -21,6 +21,16 @@ setup_app()
         git clone https://github.com/unikraft/app-"$app_basename" "$app"
     fi
 
+    for l in $app_libs; do
+        if test ! -d "$libs"/"$l"; then
+        git clone https://github.com/unikraft/lib-"$l" "$libs"/"$l"
+        pushd "$libs"/"$l" > /dev/null
+        if test $(type -t setup_"$l") == "function"; then
+            setup_"$l"
+        fi
+        popd > /dev/null
+    fi
+    done
     pushd "$app" > /dev/null
     git reset --hard HEAD
     popd > /dev/null
