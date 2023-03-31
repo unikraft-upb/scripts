@@ -100,7 +100,7 @@ install_lib()
     if test ! -d "$libs"/"$l"; then
         git clone https://github.com/unikraft/lib-"$l" "$libs"/"$l"
         pushd "$libs"/"$l" > /dev/null
-        if test $(type -t setup_"$l") == "function"; then
+        if test "$(type -t setup_"$l")" = "function"; then
             setup_"$l"
         fi
         popd > /dev/null
