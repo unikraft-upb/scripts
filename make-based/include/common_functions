@@ -136,7 +136,13 @@ build()
     fi
 
     pushd "$app" > /dev/null
-    make -j $(nproc)
+    if test ! -z "$USE_AARCH64"; then
+        if test "$USE_AARCH64" -eq 1; then
+            make CROSS_COMPILER=$AARCH64_GCC_BASE -j $(nproc)
+        fi
+    else
+        make -j $(nproc)
+    fi
     popd > /dev/null
 }
 
