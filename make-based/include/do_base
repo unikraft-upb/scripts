@@ -27,7 +27,13 @@ setup_app()
 
     # Copy configuration and build files to app folder.
     cp "$SCRIPT_DIR"/../app-"$app_basename"/files/* "$app" 2> /dev/null
-    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config "$app" 2> /dev/null
+    if test ! -z "$USE_AARCH64"; then
+        if test "$USE_AARCH64" -eq 1; then
+            cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config-aarch64 "$app"/.config 2> /dev/null
+        fi
+    else
+        cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config "$app" 2> /dev/null
+    fi
 
     if test ! -z "$app_libs"; then
         for l in $app_libs; do
@@ -36,15 +42,28 @@ setup_app()
     fi
 }
 
-kvm_image=build/"$app_basename"_kvm-x86_64
+if test ! -z "$USE_AARCH64"; then
+    if test "$USE_AARCH64" -eq 1; then
+        kvm_image=build/"$app_basename"_kvm-arm64
+    fi
+else
+    kvm_image=build/"$app_basename"_kvm-x86_64
+fi
 
 if test -z "$memory"; then
     memory="256M"
 fi
 
 arguments="-m $memory -nographic -nodefaults "
-arguments+="-display none -serial stdio -device isa-debug-exit "
 arguments+="-kernel $kvm_image "
+
+if test ! -z "$USE_AARCH64"; then
+    if test "$USE_AARCH64" -eq 1; then
+        arguments+="-machine virt -cpu cortex-a57 -display none -serial stdio "
+    fi
+else
+    arguments+="-display none -serial stdio -device isa-debug-exit "
+fi
 
 if test ! -z "$use_9p_rootfs"; then
     if test "$use_9p_rootfs" -eq 1; then
@@ -77,7 +96,13 @@ run()
         exit 1
     fi
     pushd "$app" > /dev/null
-    eval sudo qemu-system-x86_64 "$arguments"
+    if test ! -z "$USE_AARCH64"; then
+        if test "$USE_AARCH64" -eq 1; then
+            eval sudo "$AARCH64_QEMU" "$arguments"
+        fi
+    else
+        eval sudo qemu-system-x86_64 "$arguments"
+    fi
     popd > /dev/null
 }
 
@@ -88,7 +113,13 @@ run_debug()
         exit 1
     fi
     pushd "$app" > /dev/null
-    eval sudo qemu-system-x86_64 "$arguments" -gdb tcp::1234 -S
+    if test ! -z "$USE_AARCH64"; then
+        if test "$USE_AARCH64" -eq 1; then
+            eval sudo "$AARCH64_QEMU" "$arguments" -gdb tcp::1234 -S
+        fi
+    else
+        eval sudo qemu-system-x86_64 "$arguments" -gdb tcp::1234 -S
+    fi
     popd > /dev/null
 }
 
