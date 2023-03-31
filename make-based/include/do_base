@@ -21,6 +21,10 @@ setup_app()
         git clone https://github.com/unikraft/app-"$app_basename" "$app"
     fi
 
+    if  [ "$app_basename" = "python3" ]; then
+        mkdir "$SCRIPT_DIR"/"$app"/fs0 && tar -xvzf "$SCRIPT_DIR"/"$app"/minrootfs.tgz -C "$SCRIPT_DIR"/"$app"/fs0
+    fi
+
     pushd "$app" > /dev/null
     git reset --hard HEAD
     popd > /dev/null
