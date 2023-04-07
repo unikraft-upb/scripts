@@ -1,85 +1,5 @@
 #!/bin/bash
 
-setup_unikraft()
-{
-    :
-}
-
-setup_musl()
-{
-    :
-}
-
-setup_lwip()
-{
-    :
-}
-
-setup_libcxx()
-{
-    :
-}
-
-setup_libcxxabi()
-{
-    :
-}
-
-setup_libunwind()
-{
-    :
-}
-
-setup_compiler_rt()
-{
-    :
-}
-
-setup_libc_test()
-{
-    :
-}
-
-setup_libsodium()
-{
-    :
-}
-
-setup_zlib()
-{
-    :
-}
-
-setup_libuuid()
-{
-    :
-}
-
-setup_python3()
-{
-    :
-}
-
-setup_nginx()
-{
-    :
-}
-
-setup_micropython()
-{
-    :
-}
-
-setup_gcc()
-{
-    :
-}
-
-setup_libgo()
-{
-    :
-}
-
 setup_base()
 {
     mkdir -p "$top"
@@ -89,7 +9,9 @@ setup_base()
     if test ! -d "$uk"; then
         git clone https://github.com/unikraft/unikraft "$uk"
         pushd "$uk" > /dev/null
-        setup_unikraft
+        if test "$(type -t setup_unikraft)" = "function"; then
+            setup_unikraft
+        fi
         popd > /dev/null
     fi
 }
