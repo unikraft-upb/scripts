@@ -136,6 +136,7 @@ build()
     fi
 
     pushd "$app" > /dev/null
+    make prepare
     make -j $(nproc)
     popd > /dev/null
 }
