@@ -29,7 +29,7 @@ install_lib()
     fi
 }
 
-all_libs="musl lwip libcxx libcxxabi libunwind compiler-rt libc-test libsodium zlib libuuid python3 sqlite redis nginx micropython gcc libgo"
+all_libs="musl lwip libcxx libcxxabi libunwind compiler-rt libc-test libsodium zlib libuuid python3 sqlite redis nginx micropython gcc libgo zydis libelf"
 
 setup_all_libs()
 {
