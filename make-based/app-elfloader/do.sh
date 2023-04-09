@@ -115,7 +115,8 @@ run()
     popd > /dev/null
 }
 
-target_apps=("helloworld" "helloworld_go" "helloworld_cpp" "helloworld_rust_musl" "helloworld_rust_gnu" "nginx" "redis" "sqlite3" "bc" "gzip")
+target_apps=("helloworld_static" "server_static" "helloworld_go_static" "server_go_static" "helloworld_cpp_static" "helloworld_rust_static_musl" "helloworld_rust_static_gnu" "nginx_static" "redis_static" "sqlite3" "bc_static" "gzip_static")
+target_apps+=("helloworld" "server" "helloworld_go" "server_go" "helloworld_cpp" "helloworld_rust" "nginx" "redis" "sqlite3" "bc" "gzip")
 
 usage()
 {
