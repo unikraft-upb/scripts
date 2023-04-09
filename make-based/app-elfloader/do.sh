@@ -60,7 +60,7 @@ setup_app()
     popd > /dev/null
 
     # Copy configuration and build files to app folder.
-    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/* "$app"
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/Makefile{,.uk} "$app"
     cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config "$app"
 
     if test ! -z "$app_libs"; then
@@ -84,7 +84,7 @@ setup_app_debug()
     popd > /dev/null
 
     # Copy configuration and build files to app folder.
-    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/* "$app"
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/Makefile{,.uk} "$app"
     cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config_debug "$app"/.config
 
     if test ! -z "$app_libs"; then
@@ -102,9 +102,14 @@ run()
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
         exit 1
     fi
+    if test ! -d "$apps"/run-app-elfloader; then
+        echo "run-app-elfloader folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
 
     target_app="$1"
 
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/defaults "$apps"/run-app-elfloader/
     pushd "$apps"/run-app-elfloader > /dev/null
     eval ./run_app.sh "$target_app"
     popd > /dev/null
