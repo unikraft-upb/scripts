@@ -215,8 +215,11 @@ build()
     fi
     pushd "$app" > /dev/null
     export UK_WORKDIR=$(pwd)/../../
+    git checkout -- kraft.yaml
     kraft configure -F -m x86_64 -p kvm
+    git checkout -- kraft.yaml
     kraft prepare
+    git checkout -- kraft.yaml
     kraft build -j $(nproc)
     popd > /dev/null
 }
