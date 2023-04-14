@@ -24,6 +24,9 @@ source "$SCRIPT_DIR"/../include/common_functions
 
 setup_elfloader()
 {
+    git reset --hard HEAD
+    git checkout staging > /dev/null 2>&1
+
     git remote rm csvancea > /dev/null 2>&1
     git remote add csvancea https://github.com/csvancea/app-elfloader/
     git fetch csvancea
@@ -32,8 +35,9 @@ setup_elfloader()
     git branch -D csvancea/fix/unaligned-stack > /dev/null 2>&1
     git branch csvancea/fix/argv-parser csvancea/csvancea/fix/argv-parser
     git branch csvancea/fix/unaligned-stack csvancea/csvancea/fix/unaligned-stack
+
     git branch -D setup > /dev/null 2>&1
-    git checkout -b setup
+    git checkout -b setup staging
     git rebase csvancea/fix/argv-parser
     git rebase csvancea/fix/unaligned-stack
 
@@ -44,6 +48,45 @@ setup_elfloader()
     if test ! -d ../static-pie-apps; then
         git clone https://github.com/unikraft/static-pie-apps ../static-pie-apps
     fi
+    if test ! -d ../dynamic-apps; then
+        git clone https://github.com/unikraft/dynamic-apps ../dynamic-apps
+    fi
+}
+
+setup_unikraft()
+{
+    git reset --hard HEAD
+    git checkout staging > /dev/null 2>&1
+
+    git remote rm csvancea > /dev/null 2>&1
+    git remote add csvancea https://github.com/csvancea/unikraft
+    git fetch csvancea
+    git branch -D csvancea/fix/stat-mode-type > /dev/null 2>&1
+    git branch csvancea/fix/stat-mode-type csvancea/csvancea/fix/stat-mode-type
+    git branch -D csvancea/feature/allow-non-writable-shared-file-mappings > /dev/null 2>&1
+    git branch csvancea/feature/allow-non-writable-shared-file-mappings csvancea/csvancea/feature/allow-non-writable-shared-file-mappings
+
+    git remote rm andraprs > /dev/null 2>&1
+    git remote add andraprs https://github.com/andraprs/unikraft
+    git fetch andraprs
+    git branch -D 9pfs-symlink-fix > /dev/null 2>&1
+    git branch 9pfs-symlink-fix andraprs/9pfs-symlink-fix
+
+    git remote rm marcrittinghaus > /dev/null 2>&1
+    git remote add marcrittinghaus https://github.com/marcrittinghaus/unikraft
+    git fetch marcrittinghaus
+    git branch -D mritting/pr_appcompat_fixes > /dev/null 2>&1
+    git branch mritting/pr_appcompat_fixes marcrittinghaus/mritting/pr_appcompat_fixes
+    git branch -D mritting/pr_prsyscall_struct > /dev/null 2>&1
+    git branch mritting/pr_prsyscall_struct marcrittinghaus/mritting/pr_prsyscall_struct
+
+    git branch -D setup > /dev/null 2>&1
+    git checkout -b setup staging
+    git rebase 9pfs-symlink-fix
+    git rebase csvancea/fix/stat-mode-type
+    git rebase csvancea/feature/allow-non-writable-shared-file-mappings
+    git rebase mritting/pr_appcompat_fixes
+    git rebase mritting/pr_prsyscall_struct
 }
 
 setup_app()
