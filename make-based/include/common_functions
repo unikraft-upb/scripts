@@ -8,12 +8,12 @@ setup_base()
 
     if test ! -d "$uk"; then
         git clone https://github.com/unikraft/unikraft "$uk"
-        pushd "$uk" > /dev/null
-        if test "$(type -t setup_unikraft)" = "function"; then
-            setup_unikraft
-        fi
-        popd > /dev/null
     fi
+    pushd "$uk" > /dev/null
+    if test "$(type -t setup_unikraft)" = "function"; then
+        setup_unikraft
+    fi
+    popd > /dev/null
 }
 
 install_lib()
@@ -21,12 +21,12 @@ install_lib()
     l="$1"
     if test ! -d "$libs"/"$l"; then
         git clone https://github.com/unikraft/lib-"$l" "$libs"/"$l"
-        pushd "$libs"/"$l" > /dev/null
-        if test "$(type -t setup_"$l")" = "function"; then
-            setup_"$l"
-        fi
-        popd > /dev/null
     fi
+    pushd "$libs"/"$l" > /dev/null
+    if test "$(type -t setup_"$l")" = "function"; then
+        setup_"$l"
+    fi
+    popd > /dev/null
 }
 
 all_libs="musl lwip libcxx libcxxabi libunwind compiler-rt libc-test libsodium zlib libuuid python3 sqlite redis nginx micropython gcc libgo zydis libelf"
