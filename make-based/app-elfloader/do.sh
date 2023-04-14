@@ -137,6 +137,30 @@ setup_app_debug()
     fi
 }
 
+setup_app_plain()
+{
+    if ! test -d "$app"; then
+        git clone https://github.com/unikraft/app-"$app_basename" "$app"
+    fi
+
+    pushd "$app" > /dev/null
+    git reset --hard HEAD
+    if test "$(type -t setup_"$app_basename")" = "function"; then
+        setup_"$app_basename"
+    fi
+    popd > /dev/null
+
+    # Copy configuration and build files to app folder.
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/Makefile{,.uk} "$app"
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config_plain "$app"/.config
+
+    if test ! -z "$app_libs"; then
+        for l in $app_libs; do
+            install_lib "$l"
+        done
+    fi
+}
+
 kvm_image=build/app-"$app_basename"_kvm-x86_64
 
 run()
@@ -165,7 +189,7 @@ usage()
 {
 
     echo "Usage: $0 <command> [<app>]" 1>&2
-    echo "  command: setup setup_debug configure build docker_build clean docker_clean run remove" 1>&2
+    echo "  command: setup setup_debug setup_plain configure build docker_build clean docker_clean run remove" 1>&2
     echo "  app (for run): ${target_apps[@]}" 1>&2
 }
 
@@ -186,6 +210,11 @@ case "$command" in
     "setup_debug")
         setup_base
         setup_app_debug
+        ;;
+
+    "setup_plain")
+        setup_base
+        setup_app_plain
         ;;
 
     "configure")
