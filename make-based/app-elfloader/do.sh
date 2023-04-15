@@ -178,6 +178,27 @@ run()
 
     cp "$SCRIPT_DIR"/../app-"$app_basename"/files/defaults "$apps"/run-app-elfloader/
     pushd "$apps"/run-app-elfloader > /dev/null
+    git reset --hard HEAD
+    git checkout master
+    eval ./run_app.sh "$target_app"
+    popd > /dev/null
+}
+
+run_built()
+{
+    if test ! -d "$app"; then
+        echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+    if test ! -d "$apps"/run-app-elfloader; then
+        echo "run-app-elfloader folder doesn't exist. Did you run '$0 setup'?" 1>&2
+        exit 1
+    fi
+
+    target_app="$1"
+
+    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/defaults "$apps"/run-app-elfloader/
+    pushd "$apps"/run-app-elfloader > /dev/null
     eval ./run_app.sh "$target_app"
     popd > /dev/null
 }
@@ -189,7 +210,7 @@ usage()
 {
 
     echo "Usage: $0 <command> [<app>]" 1>&2
-    echo "  command: setup setup_debug setup_plain configure build docker_build clean docker_clean run remove" 1>&2
+    echo "  command: setup setup_debug setup_plain configure build docker_build clean docker_clean run run_built remove" 1>&2
     echo "  app (for run): ${target_apps[@]}" 1>&2
 }
 
@@ -244,6 +265,15 @@ case "$command" in
             exit 1
         fi
         run "$2"
+        ;;
+
+    "run_built")
+        if test $# -ne 2; then
+            echo "'run_built' command requires target application as argument" 1>&2
+            echo "Target applications: ${target_apps[@]}" 1>&2
+            exit 1
+        fi
+        run_built "$2"
         ;;
 
     "remove")
