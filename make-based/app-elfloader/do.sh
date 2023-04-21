@@ -220,7 +220,7 @@ run_built()
     popd > /dev/null
 }
 
-target_apps=("helloworld_static" "server_static" "helloworld_go_static" "server_go_static" "helloworld_cpp_static" "helloworld_rust_static_musl" "helloworld_rust_static_gnu" "nginx_static" "redis_static" "sqlite3" "bc_static" "gzip_static" "client_static" "client_go_static")
+target_apps=("helloworld_static" "server_static" "helloworld_go_static" "server_go_static" "helloworld_cpp_static" "helloworld_rust_static_musl" "helloworld_rust_static_gnu" "nginx_static" "redis_static" "sqlite3" "bc_static" "gzip_static" "client_static" "client_go_static" "node_static_gnu" "node_static_musl")
 target_apps+=("helloworld" "server" "helloworld_go" "server_go" "helloworld_cpp" "helloworld_rust" "nginx" "redis" "sqlite3" "bc" "gzip" "client" "client_go" "echo" "ls" "python" "openssl")
 
 usage()
