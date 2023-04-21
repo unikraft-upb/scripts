@@ -53,6 +53,22 @@ setup_elfloader()
     fi
 }
 
+setup_lwip()
+{
+    git reset --hard HEAD
+    git checkout staging > /dev/null 2>&1
+
+    git remote rm marcrittinghaus > /dev/null 2>&1
+    git remote add marcrittinghaus https://github.com/marcrittinghaus/lib-lwip
+    git fetch marcrittinghaus
+    git branch -D mritting/pr_sock_nonblock > /dev/null 2>&1
+    git branch mritting/pr_sock_nonblock marcrittinghaus/mritting/pr_sock_nonblock
+
+    git branch -D setup > /dev/null 2>&1
+    git checkout -b setup staging
+    git rebase mritting/pr_sock_nonblock
+}
+
 setup_unikraft()
 {
     git reset --hard HEAD
@@ -221,7 +237,7 @@ run_built()
 }
 
 target_apps=("helloworld_static" "server_static" "helloworld_go_static" "server_go_static" "helloworld_cpp_static" "helloworld_rust_static_musl" "helloworld_rust_static_gnu" "nginx_static" "redis_static" "sqlite3" "bc_static" "gzip_static" "client_static" "client_go_static" "node_static_gnu" "node_static_musl")
-target_apps+=("helloworld" "server" "helloworld_go" "server_go" "helloworld_cpp" "helloworld_rust" "nginx" "redis" "sqlite3" "bc" "gzip" "client" "client_go" "echo" "ls" "python" "openssl")
+target_apps+=("helloworld" "server" "helloworld_go" "server_go" "helloworld_cpp" "helloworld_rust" "nginx" "redis" "sqlite3" "bc" "gzip" "client" "client_go" "echo" "ls" "python" "openssl" "haproxy")
 
 usage()
 {
