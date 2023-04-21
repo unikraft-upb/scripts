@@ -79,6 +79,22 @@ setup_unikraft()
     git branch mritting/pr_appcompat_fixes marcrittinghaus/mritting/pr_appcompat_fixes
     git branch -D mritting/pr_prsyscall_struct > /dev/null 2>&1
     git branch mritting/pr_prsyscall_struct marcrittinghaus/mritting/pr_prsyscall_struct
+    git branch -D mritting/pr_fix_accept_nonblock > /dev/null 2>&1
+    git branch mritting/pr_fix_accept_nonblock marcrittinghaus/mritting/pr_fix_accept_nonblock
+    git branch -D mritting/pr_fix_devfs > /dev/null 2>&1
+    git branch mritting/pr_fix_devfs marcrittinghaus/mritting/pr_fix_devfs
+
+    git remote rm unikraft-upb > /dev/null 2>&1
+    git remote add unikraft-upb https://github.com/unikraft-upb/unikraft
+    git fetch unikraft-upb
+    git branch -D StefanJum/fix-symlink-error > /dev/null 2>&1
+    git branch StefanJum/fix-symlink-error unikraft-upb/StefanJum/fix-symlink-error
+
+    git remote rm John-Ted > /dev/null 2>&1
+    git remote add John-Ted https://github.com/John-Ted/unikraft
+    git fetch John-Ted
+    git branch -D remove_clone3 > /dev/null 2>&1
+    git branch remove_clone3 John-Ted/remove_clone3
 
     git branch -D setup > /dev/null 2>&1
     git checkout -b setup staging
@@ -87,6 +103,7 @@ setup_unikraft()
     git rebase csvancea/feature/allow-non-writable-shared-file-mappings
     git rebase mritting/pr_appcompat_fixes
     git rebase mritting/pr_prsyscall_struct
+    git rebase StefanJum/fix-symlink-error
 }
 
 setup_app()
