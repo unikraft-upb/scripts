@@ -3,7 +3,7 @@
 usage()
 {
     echo "Usage: $0 <command>" 1>&2
-    echo "  command: setup configure build docker_build clean docker_clean run run_debug remove" 1>&2
+    echo "  command: setup configure build build_clang docker_build clean docker_clean run run_debug remove" 1>&2
 }
 
 if test $# -ne 1; then
@@ -11,6 +11,7 @@ if test $# -ne 1; then
     exit 1
 fi
 
+cc=
 command="$1"
 
 case "$command" in
@@ -25,6 +26,12 @@ case "$command" in
         ;;
 
     "build")
+        cc="gcc"
+        build
+        ;;
+
+    "build_clang")
+        cc="clang"
         build
         ;;
 

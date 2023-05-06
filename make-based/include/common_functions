@@ -59,7 +59,7 @@ build()
 
     pushd "$app" > /dev/null
     make prepare
-    make -j $(nproc)
+    make CC="$cc" -j $(nproc) || exit 1
     popd > /dev/null
 }
 
