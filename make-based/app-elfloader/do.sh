@@ -276,6 +276,7 @@ case "$command" in
         ;;
 
     "build")
+        cc=gcc
         build
         ;;
 
