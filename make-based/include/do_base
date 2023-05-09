@@ -43,7 +43,7 @@ setup_app()
     fi
 }
 
-kvm_image=build/"$app_basename"_kvm-x86_64
+kvm_image=build/"$app_basename"_qemu-x86_64
 
 if test -z "$memory"; then
     memory="256M"
