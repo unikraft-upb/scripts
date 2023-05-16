@@ -34,7 +34,12 @@ setup_app()
 
     # Copy configuration and build files to app folder.
     cp "$SCRIPT_DIR"/../app-"$app_basename"/files/* "$app" 2> /dev/null
-    cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config "$app" 2> /dev/null
+
+    if test "$arch" = "x86_64"; then
+        cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config "$app" 2> /dev/null
+    elif test "$arch" = "arm64"; then
+        cp "$SCRIPT_DIR"/../app-"$app_basename"/files/.config_arm64 "$app/.config" 2> /dev/null || (echo "No configuration file for ARM64 found" 2>&1; exit 1)
+    fi
 
     if test ! -z "$app_libs"; then
         for l in $app_libs; do
@@ -43,71 +48,98 @@ setup_app()
     fi
 }
 
-kvm_image=build/"$app_basename"_qemu-x86_64
+setup_arguments()
+{
+    kvm_image=build/"$app_basename"_qemu-"$arch"
 
-if test -z "$memory"; then
-    memory="256M"
-fi
-
-arguments="-m $memory -nographic -nodefaults "
-arguments+="-display none -serial stdio -device isa-debug-exit "
-arguments+="-kernel $kvm_image "
-
-app_arguments=""
-
-if test ! -z "$use_9p_rootfs"; then
-    if test "$use_9p_rootfs" -eq 1; then
-        arguments+="-fsdev local,security_model=passthrough,id=hvirtio0,path=$rootfs_9p "
-        arguments+="-device virtio-9p-pci,fsdev=hvirtio0,mount_tag=fs0,disable-modern=on,disable-legacy=off "
+    if test -z "$memory"; then
+        memory="256M"
     fi
-fi
 
-if test ! -z "$use_initrd"; then
-    if test "$use_initrd" -eq 1; then
-        arguments+="-initrd $initrd "
+    arguments="-m $memory -nographic -nodefaults "
+    arguments+="-display none -serial stdio "
+    arguments+="-kernel $kvm_image "
+
+    if test "$arch" = "x86_64"; then
+        arguments+="-device isa-debug-exit "
     fi
-fi
 
-if test ! -z "$use_kvm"; then
-    if test "$use_kvm" -eq 1; then
-        arguments+="-enable-kvm -cpu host "
+    app_arguments=""
+
+    if test ! -z "$use_9p_rootfs"; then
+        if test "$use_9p_rootfs" -eq 1; then
+            arguments+="-fsdev local,security_model=passthrough,id=hvirtio0,path=$rootfs_9p "
+            arguments+="-device virtio-9p-pci,fsdev=hvirtio0,mount_tag=fs0,disable-modern=on,disable-legacy=off "
+        fi
     fi
-else
-    arguments+="-enable-kvm -cpu host "
-fi
 
-if test ! -z "$use_networking"; then
-    if test "$use_networking" -eq 1; then
-        _setup_networking
-        arguments+="-netdev bridge,id=en0,br=virbr0 "
-        arguments+="-device virtio-net-pci,netdev=en0 "
-        app_arguments+="netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- "
+    if test ! -z "$use_initrd"; then
+        if test "$use_initrd" -eq 1; then
+            arguments+="-initrd $initrd "
+        fi
     fi
-fi
 
-if test ! -z "$extra_app_arguments"; then
-	app_arguments+="$extra_app_arguments"
-fi
+    if test ! -z "$use_kvm" && test "$arch" = "x86_64"; then
+        if test "$use_kvm" -eq 1; then
+            arguments+="-enable-kvm -cpu host "
+        fi
+    elif test "$arch" = "x86_64"; then
+            arguments+="-enable-kvm -cpu host "
+    fi
+
+    if test "$arch" = "arm64"; then
+        arguments+="-machine virt -cpu max "
+    fi
+
+    if test ! -z "$use_networking"; then
+        if test "$use_networking" -eq 1; then
+            _setup_networking
+            arguments+="-netdev bridge,id=en0,br=virbr0 "
+            arguments+="-device virtio-net-pci,netdev=en0 "
+            app_arguments+="netdev.ipv4_addr=172.44.0.2 netdev.ipv4_gw_addr=172.44.0.1 netdev.ipv4_subnet_mask=255.255.255.0 -- "
+        fi
+    fi
+
+    if test ! -z "$extra_app_arguments"; then
+        app_arguments+="$extra_app_arguments"
+    fi
+}
 
 run()
 {
+    setup_arguments
+
     if test ! -d "$app"; then
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
         exit 1
     fi
     pushd "$app" > /dev/null
-    eval sudo qemu-system-x86_64 "$arguments" -append "\"$app_arguments\""
+
+    if test "$arch" = "x86_64"; then
+        eval sudo qemu-system-x86_64 "$arguments" -append "\"$app_arguments\""
+    elif test "$arch" = "arm64"; then
+        eval sudo qemu-system-aarch64 "$arguments" -append "\"$app_arguments\""
+    fi
+
     popd > /dev/null
 }
 
 run_debug()
 {
+    setup_arguments
+
     if test ! -d "$app"; then
         echo "$app folder doesn't exist. Did you run '$0 setup'?" 1>&2
         exit 1
     fi
     pushd "$app" > /dev/null
-    eval sudo qemu-system-x86_64 "$arguments" -gdb tcp::1234 -S -append "\"$app_arguments\""
+
+    if test "$arch" = "x86_64"; then
+        eval sudo qemu-system-x86_64 "$arguments" -gdb tcp::1234 -S -append "\"$app_arguments\""
+    elif test "$arch" = "arm64"; then
+        eval sudo qemu-system-arm64 "$arguments" -gdb tcp::1234 -S -append "\"$app_arguments\""
+    fi
+
     popd > /dev/null
 }
 
