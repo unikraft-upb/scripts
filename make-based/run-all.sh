@@ -35,6 +35,8 @@ test_common_errors()
 
 test_booting()
 {
+    echo -n "Running $app... "
+
     /bin/bash "do.sh" run > "$tmp_file" 2>&1 &
 
     sleep 5
@@ -60,6 +62,8 @@ test_booting()
 
 test_elfloader()
 {
+    echo -n "Running $app... "
+
     # The elfloader should be tested separately from the automated tested
     # applications, since you need to run multiple apps with it.
     # Maybe we can find a way to automate testing the alfloader too, by
@@ -70,6 +74,8 @@ test_elfloader()
 
 test_python3()
 {
+    echo -n "Running $app... "
+
     # HACK: Clearly not the best way to do this.
     # Find a way to capture the output of an application when ran using the
     # `./do.sh` files.
@@ -89,6 +95,8 @@ test_python3()
 
 test_nginx()
 {
+    echo -n "Running $app... "
+
     /bin/bash "do.sh" run < /dev/null > "$tmp_file" 2>&1 &
     sleep 2
 
@@ -104,6 +112,8 @@ test_nginx()
 
 test_httpreply()
 {
+    echo -n "Running $app... "
+
     /bin/bash "do.sh" run < /dev/null > "$tmp_file" 2>&1 &
     sleep 2
 
@@ -118,6 +128,8 @@ test_httpreply()
 
 test_redis()
 {
+    echo -n "Running $app... "
+
     /bin/bash "do.sh" run < /dev/null > "$tmp_file" 2>&1 &
     sleep 2
 
@@ -137,7 +149,7 @@ test_sqlite()
     # HACK: Clearly not the best way to do this.
     # Find a way to capture the output of an application when ran using the
     # `./do.sh` files.
-    (sleep 4; echo -e '.open chinook.db\nselect * from Album;\n.exit') | /bin/bash "do.sh" run > "$tmp_file" 2>&1 &
+    (sleep 4; echo -e '.open chinook.db\nselect * from Album;\n.read script.sql\nselect * from tab;\n.exit') | /bin/bash "do.sh" run > "$tmp_file" 2>&1 &
 
     sleep 10
     sudo kill -KILL $(pgrep -f "qemu-system.*$app") > /dev/null 2>&1
@@ -147,12 +159,19 @@ test_sqlite()
         return
     fi
 
+    echo -n "Running $app .open test ... "
     grep -E "^346\|Mozart: Chamber Music\|274" < "$tmp_file" > /dev/null 2>&1 && echo "PASSED" || echo "FAILED"
+
+    echo -n "Running $app .read test ... "
+    grep -E "^123456|abcdef" < "$tmp_file" > /dev/null 2>&1 && echo "PASSED" || echo "FAILED"
+
     rm -f "$tmp_file"
 }
 
 test_micropython()
 {
+    echo -n "Running $app... "
+
     # HACK: Clearly not the best way to do this.
     # Find a way to capture the output of an application when ran using the
     # `./do.sh` files.
@@ -178,7 +197,6 @@ test_automated()
         app=$(echo "$script" | cut -d'-' -f2-)
         pushd "$script" > /dev/null || exit 1
 
-        echo -n "Running $app... "
         if test "$(type -t "test_$app")" = "function"; then
             ( test_"$app" )
         else
