@@ -13,10 +13,12 @@ top=$(pwd)/../workdir
 libs=$(pwd)/../workdir/libs
 uk=$(pwd)/../workdir/unikraft
 
+arch=
+
 source "$SCRIPT_DIR"/../include/common_functions
 
-if test $# -lt 1; then
-    echo -e "Usage: $0 <PR-number | branch> [deps]\n" 1>&2
+if test $# -lt 2 || ! { test "$1" = "x86_64" || test "$1" = "arm64"; }; then
+    echo -e "Usage: $0 <x86_64 | arm64> <PR-number | branch> [deps]\n" 1>&2
     echo "The dependencies are PRs from the unikraft core or external libraries repositories." 1>&2
     echo -e "\ne.g. $0 123 musl/10 unikraft/20 lwip/15" 1>&2
     echo "will pull PRs 123 and 20 from the unikraft core, PR 10 from lib-musl and PR 20 form lwip."
@@ -24,6 +26,9 @@ if test $# -lt 1; then
     echo "will pull PR 20 from the unikraft core, PR 10 from lib-musl and PR 20 form lwip."
     exit 1
 fi
+
+test "$1" = "arm64" && arch="_arm64"
+shift 1
 
 log_file=$(pwd)/logs/err.log
 PR_number="$1"
@@ -81,15 +86,17 @@ while read -r script; do
         continue
     fi
 
-    echo -n "Building $app using 'clang'... "
-    /bin/bash "do.sh" clean > /dev/null 2>&1
-    /bin/bash "do.sh" setup > /dev/null 2>&1
-    yes "" | /bin/bash "do.sh" build_clang 1> /dev/null 2> "$log_file.$app.clang" && echo "PASSED" || echo "FAILED"
+    if test "$arch" != "_arm64"; then
+        echo -n "Building $app using 'clang'... "
+        /bin/bash "do.sh" clean > /dev/null 2>&1
+        /bin/bash "do.sh" setup"$arch" > /dev/null 2>&1
+        yes "" | /bin/bash "do.sh" build_clang 1> /dev/null 2> "$log_file.$app.clang" && echo "PASSED" || echo "FAILED"
+    fi
 
     echo -n "Building $app using 'gcc'... "
     /bin/bash "do.sh" clean > /dev/null 2>&1
-    /bin/bash "do.sh" setup > /dev/null 2>&1
-    yes "" | /bin/bash "do.sh" build 1> /dev/null 2> "$log_file.$app.gcc" && echo "PASSED" || echo "FAILED"
+    /bin/bash "do.sh" setup"$arch" > /dev/null 2>&1
+    yes "" | /bin/bash "do.sh" build"$arch" 1> /dev/null 2> "$log_file.$app.gcc" && echo "PASSED" || echo "FAILED"
 
     popd > /dev/null || exit 1
 done <<< "$(find . -type d -name "app*")"
