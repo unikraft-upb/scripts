@@ -1,5 +1,13 @@
 #!/bin/bash
 
+reset_to_release_branch()
+{
+    git reset --hard HEAD
+    git checkout staging
+    git branch -D br-"$release_tag"
+    git checkout -b br-"$release_tag" "$release_tag"
+}
+
 setup_base()
 {
     mkdir -p "$top"
@@ -9,7 +17,9 @@ setup_base()
     if test ! -d "$uk"; then
         git clone https://github.com/unikraft/unikraft "$uk"
     fi
+
     pushd "$uk" > /dev/null
+    reset_to_release_branch
     if test "$(type -t setup_unikraft)" = "function"; then
         setup_unikraft
     fi
@@ -22,7 +32,9 @@ install_lib()
     if test ! -d "$libs"/"$l"; then
         git clone https://github.com/unikraft/lib-"$l" "$libs"/"$l"
     fi
+
     pushd "$libs"/"$l" > /dev/null
+    reset_to_release_branch
     if test "$(type -t setup_"$l")" = "function"; then
         setup_"$l"
     fi

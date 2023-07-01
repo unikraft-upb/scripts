@@ -1,5 +1,6 @@
 #!/bin/bash
 
+release_tag="RELEASE-0.13.1"
 top=../../workdir
 libs="$top"/libs
 apps="$top"/apps
