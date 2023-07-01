@@ -4,6 +4,14 @@ testing_dir="$(pwd)"
 logging_dir="$testing_dir/logs"
 log_file="$logging_dir/run.log"
 tmp_file="$logging_dir/tmp.log"
+arch=
+
+if test "$1" != "arm64" && test "$1" != "x86_64"; then
+    echo "Usage: $0 <x86_64 | arm64>" 1>&2
+    exit 1
+fi
+
+test "$1" = "arm64" && arch="_arm64"
 
 test_common_errors()
 {
@@ -35,7 +43,7 @@ test_common_errors()
 
 test_booting()
 {
-    /bin/bash "do.sh" run > "$tmp_file" 2>&1 &
+    /bin/bash "do.sh" run"$arch" > "$tmp_file" 2>&1 &
 
     sleep 5
     sudo kill -KILL $(pgrep -f "qemu-system.*$app") > /dev/null 2>&1
@@ -73,7 +81,7 @@ test_python3()
     # HACK: Clearly not the best way to do this.
     # Find a way to capture the output of an application when ran using the
     # `./do.sh` files.
-    (sleep 4; echo 'print("Hello World")') | /bin/bash "do.sh" run > "$tmp_file" 2>&1 &
+    (sleep 4; echo 'print("Hello World")') | /bin/bash "do.sh" run"$arch" > "$tmp_file" 2>&1 &
     sleep 10
 
     test_common_errors
@@ -89,7 +97,7 @@ test_python3()
 
 test_nginx()
 {
-    /bin/bash "do.sh" run < /dev/null > "$tmp_file" 2>&1 &
+    /bin/bash "do.sh" run"$arch" < /dev/null > "$tmp_file" 2>&1 &
     sleep 2
 
     test_common_errors
@@ -104,7 +112,7 @@ test_nginx()
 
 test_httpreply()
 {
-    /bin/bash "do.sh" run < /dev/null > "$tmp_file" 2>&1 &
+    /bin/bash "do.sh" run"$arch" < /dev/null > "$tmp_file" 2>&1 &
     sleep 2
 
     test_common_errors
@@ -118,7 +126,7 @@ test_httpreply()
 
 test_redis()
 {
-    /bin/bash "do.sh" run < /dev/null > "$tmp_file" 2>&1 &
+    /bin/bash "do.sh" run"$arch" < /dev/null > "$tmp_file" 2>&1 &
     sleep 2
 
     test_common_errors
@@ -137,7 +145,7 @@ test_sqlite()
     # HACK: Clearly not the best way to do this.
     # Find a way to capture the output of an application when ran using the
     # `./do.sh` files.
-    (sleep 4; echo -e '.open chinook.db\nselect * from Album;\n.exit') | /bin/bash "do.sh" run > "$tmp_file" 2>&1 &
+    (sleep 4; echo -e '.open chinook.db\nselect * from Album;\n.exit') | /bin/bash "do.sh" run"$arch" > "$tmp_file" 2>&1 &
 
     sleep 10
     sudo kill -KILL $(pgrep -f "qemu-system.*$app") > /dev/null 2>&1
@@ -156,7 +164,7 @@ test_micropython()
     # HACK: Clearly not the best way to do this.
     # Find a way to capture the output of an application when ran using the
     # `./do.sh` files.
-    (sleep 4; echo 'print("Hello World")') | /bin/bash "do.sh" run > "$tmp_file" 2>&1 &
+    (sleep 4; echo 'print("Hello World")') | /bin/bash "do.sh" run"$arch" > "$tmp_file" 2>&1 &
     sleep 10
 
     test_common_errors

@@ -58,8 +58,22 @@ build()
     fi
 
     pushd "$app" > /dev/null
-    make prepare
-    make CC="$cc" -j $(nproc) || exit 1
+
+    if test "$arch" = "x86_64"; then
+        make prepare
+        CC="$cc" make  -j $(nproc) || exit 1
+    elif test "$arch" = "arm64"; then
+        if test -z "$CROSS_COMPILE"; then
+            # You should download the cross compiler from:
+            # https://developer.arm.com/downloads/-/gnu-a/10-3-2021-07
+            # You can then run CROSS_COMPILE=<path> ./do.sh run_arm64
+            CROSS_COMPILE="$HOME/.toolchain/gcc-arm-10.3-2021.07-x86_64-aarch64-none-linux-gnu/bin/aarch64-none-linux-gnu-"
+        fi;
+        CROSS_COMPILE="$CROSS_COMPILE" make prepare
+        CC="$cc" CROSS_COMPILE="$CROSS_COMPILE" make -j $(nproc) || exit 1
+    fi;
+
+
     popd > /dev/null
 }
 

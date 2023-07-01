@@ -3,7 +3,7 @@
 usage()
 {
     echo "Usage: $0 <command>" 1>&2
-    echo "  command: setup configure build build_clang docker_build clean docker_clean run run_debug remove" 1>&2
+    echo "  command: setup setup_arm64 configure build build_arm64 build_clang docker_build clean docker_clean run run_arm64 run_debug run_debug_arm64 remove" 1>&2
 }
 
 if test $# -ne 1; then
@@ -11,12 +11,18 @@ if test $# -ne 1; then
     exit 1
 fi
 
-cc=
 command="$1"
 
 case "$command" in
 
     "setup")
+        arch="x86_64"
+        setup_base
+        setup_app
+        ;;
+
+    "setup_arm64")
+        arch="arm64"
         setup_base
         setup_app
         ;;
@@ -27,15 +33,25 @@ case "$command" in
 
     "build")
         cc="gcc"
+        arch="x86_64"
         build
         ;;
 
     "build_clang")
         cc="clang"
+        arch="x86_64"
+        build
+        ;;
+
+    "build_arm64")
+        cc="gcc"
+        arch="arm64"
+        use_kvm=0
         build
         ;;
 
     "docker_build")
+        arch="x86_64"
         docker_build
         ;;
 
@@ -48,10 +64,17 @@ case "$command" in
         ;;
 
     "run")
+        arch="x86_64"
+        run
+        ;;
+
+    "run_arm64")
+        arch="arm64"
         run
         ;;
 
     "run_debug")
+        arch="x86_64"
         run_debug
         ;;
 
